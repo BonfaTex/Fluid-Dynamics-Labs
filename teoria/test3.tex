@@ -1,0 +1,319 @@
+%!TEX root = ../main.tex
+
+\chapter{Calibration of a load cell}
+\thispagestyle{empty}
+
+\section*{Descrizione del caso e obiettivi}
+
+La cella di carico è uno strumento utilizzato per misurare una forza, che produce un'uscita elettrica (voltaggio) approssimativamente proporzionale alla forza applicata (Figura~\ref{fig:c3f1}). Per stimare il valore di una forza tramite una cella di carico, è necessario determinare la \textbf{funzione di trasferimento} che converte il voltaggio in Newton \( V \, [\text{volt}] \rightarrow F \, [\text{Newton}] \). La funzione di trasferimento si ottiene utilizzando campioni di massa il cui peso \( F^* \) è noto con precisione (vedi Tabella~\ref{tab:tab-ref}). Questa operazione viene talvolta definita \textbf{calibrazione} della cella di carico. In effetti, i valori di \( V \) presentano una variabilità casuale, che rende la procedura per determinare la funzione di trasferimento analoga a quella per determinare una \textbf{curva di calibrazione}; ciò spiega il motivo per cui il termine calibrazione viene utilizzato anche in questo contesto.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width = 0.3\textwidth]{c3f1}
+\caption{Rappresentazione schematica.}
+\label{fig:c3f1}
+\end{figure}
+
+Ogni campione di massa viene applicato alla cella di carico per alcuni secondi e l'uscita elettrica corrispondente viene registrata (la frequenza di campionamento è \( f_s = 100 \, \text{Hz} \)). Questo produce un segnale rumoroso come quello mostrato in Figura~\ref{fig:c3f2} a titolo di esempio.
+
+\begin{figure}[htb]
+\centering
+\includegraphics[width = 0.5\textwidth]{c3f2}
+\caption{Segnale d'esempio.}
+\label{fig:c3f2}
+\end{figure}
+
+Le storie temporali dell'uscita in tensione e i corrispondenti valori della forza di riferimento \( F^* \) sono elencati nella Tabella~\ref{tab:tab-ref} e forniti sotto forma di \emph{workspace} MATLAB. Ogni workspace contiene il vettore delle letture in Volt (ricordare che la frequenza di campionamento è \( f_s = 100 \, \text{Hz} \)). Nella tabella, il segno di \( F^* \) è rappresentato come mostrato nello schema~\ref{fig:c3f1}: \( F^* > 0 \) quando la forza è diretta verso l'alto, e \( F^* < 0 \) quando la forza è diretta verso il basso.
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{|l|c|}
+        \toprule
+        TestID & $F^*$ [N]  \\
+        \midrule
+        calibr01 & 0.000    \\
+        calibr02 & -0.314   \\
+        calibr03 & -0.411   \\
+        calibr04 & -0.695   \\
+        calibr05 & -0.891   \\
+        calibr06 & -1.186   \\
+        calibr07 & -1.676  \\
+        calibr08 & -2.656   \\
+        calibr09 & -5.598   \\
+        calibr10 & -10.501  \\
+        calibr11 & 0.126    \\
+        calibr12 & 1.097    \\
+        calibr13 & 2.078    \\
+        calibr14 & 4.039   \\
+        calibr15 & 8.942   \\
+        calibr16 & 13.845  \\
+        \bottomrule
+    \end{tabular}
+    \caption{Dati per la calibrazione.}
+    \label{tab:tab-ref}
+\end{table}
+
+\section*{Quesito 1}
+
+Determinare la funzione di trasferimento per la cella di carico e stimare l'incertezza dello strumento.
+
+\begin{itemize}
+\item Il comportamento rumoroso del segnale di tensione è dovuto alla variabilità dell'uscita elettrica. Il rumore elettrico deve essere filtrato prima di trovare i valori di \( V_0 \) da correlare con \( F^* \) attraverso la funzione di trasferimento. Questo viene ottenuto calcolando i grafici della \textbf{media cumulativa} delle uscite istantanee della tensione.
+
+Tali grafici mostrano, per ogni \( t_i \), la media delle uscite in tensione da 0 a \( t_i \), con il tempo sull'asse orizzontale in scala logaritmica.
+
+Attraverso un'ispezione visiva delle curve, è possibile valutare se il tempo di acquisizione del segnale è sufficientemente lungo da fornire una media cumulativa della tensione \emph{ragionevolmente stabile}. In tal caso, il valore alla fine della curva, \( V \), sarà la tensione \( V_0 \) associata a \( F^* \) nelle successive elaborazioni (in alternativa, si potrebbe considerare una media dei valori nella regione \emph{stabile}). Questa operazione deve essere ripetuta per tutti i test. Una stima approssimativa del tempo di acquisizione richiesto per filtrare il rumore elettrico potrebbe essere ottenuta.
+
+\NotionDivider
+
+Si osservono i seguenti grafici. La media cumulativa può essere considerata stabile dopo un certo intervallo. Tale intervallo, detto $\widehat{t}$, è stato stimato qualitativamente per ogni figura, e il valore finale $V_0$ per ogni test è mostrato nella Tabella~\ref{tab:calibration_results}. In media, abbiamo che:
+\begin{equation*}
+\widehat{t}_{\text{medio}}=5.25~\text{s}\,.
+\end{equation*}
+
+Sempre dal punto di vista qualitativo, si potrebe decidere di non considerare alcuni test perché affetti da \emph{troppo} rumore, per esempio i test 03, 04 e 09 che nella parte \emph{stabile} presentano ancora oscillazioni. Tuttavia, in presenza di \emph{pochi} esperimenti, abbiamo deciso di considerarli tutti.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width = 0.8\textwidth]{calib-31/test1}
+\caption{Media cumulativa Test 01.}
+\label{fig:calib31-1}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width = 0.8\textwidth]{calib-31/test2}
+\caption{Media cumulativa Test 02.}
+\label{fig:calib31-2}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width = 0.8\textwidth]{calib-31/test3}
+\caption{Media cumulativa Test 03.}
+\label{fig:calib31-3}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width = 0.8\textwidth]{calib-31/test4}
+\caption{Media cumulativa Test 03.}
+\label{fig:calib31-4}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width = 0.8\textwidth]{calib-31/test5}
+\caption{Media cumulativa Test 05.}
+\label{fig:calib31-5}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width = 0.8\textwidth]{calib-31/test6}
+\caption{Media cumulativa Test 06.}
+\label{fig:calib31-6}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width = 0.8\textwidth]{calib-31/test6}
+\caption{Media cumulativa Test 06.}
+\label{fig:calib31-6}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width = 0.8\textwidth]{calib-31/test8}
+\caption{Media cumulativa Test 08.}
+\label{fig:calib31-8}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width = 0.8\textwidth]{calib-31/test9}
+\caption{Media cumulativa Test 09.}
+\label{fig:calib31-9}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width = 0.8\textwidth]{calib-31/test10}
+\caption{Media cumulativa Test 10.}
+\label{fig:calib31-10}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width = 0.8\textwidth]{calib-31/test11}
+\caption{Media cumulativa Test 11.}
+\label{fig:calib31-11}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width = 0.8\textwidth]{calib-31/test12}
+\caption{Media cumulativa Test 12.}
+\label{fig:calib31-12}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width = 0.8\textwidth]{calib-31/test13}
+\caption{Media cumulativa Test 13.}
+\label{fig:calib31-13}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width = 0.8\textwidth]{calib-31/test14}
+\caption{Media cumulativa Test 14.}
+\label{fig:calib31-14}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width = 0.8\textwidth]{calib-31/test15}
+\caption{Media cumulativa Test 15.}
+\label{fig:calib31-15}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width = 0.8\textwidth]{calib-31/test16}
+\caption{Media cumulativa Test 16.}
+\label{fig:calib31-16}
+\end{figure}
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{|l|c|c|c|}
+        \toprule
+        TestID & $F^*$ [N] & $\widehat{t}$ [s] & $V_0$ [V]  \\
+        \midrule
+        calibr01 & 0.000   & 2  & -0.000027223139966 \\
+        calibr02 & -0.314  & 1  & 0.000100843879466 \\
+        calibr03 & -0.411  & 1  & 0.000136267348651 \\
+        calibr04 & -0.695  & 1  & 0.000248955271896 \\
+        calibr05 & -0.891  & 8  & 0.000334117541684 \\
+        calibr06 & -1.186  & 6  & 0.000455141343295 \\
+        calibr07 & -1.676  & 8  & 0.000656249447185 \\
+        calibr08 & -2.656  & 1  & 0.001053949935798 \\
+        calibr09 & -5.598  & 1  & 0.002252104292335 \\
+        calibr10 & -10.501 & 2  & 0.004253872650178 \\
+        calibr11 & 0.126   & 8  & -0.000078179149378 \\
+        calibr12 & 1.097   & 2  & -0.000475867746645 \\
+        calibr13 & 2.078   & 1  & -0.000874618849803 \\
+        calibr14 & 4.039   & 1  & -0.001677096219087 \\
+        calibr15 & 8.942   & 35 & -0.003677691934402 \\
+        calibr16 & 13.845  & 6  & -0.005671186143606 \\
+        \bottomrule
+    \end{tabular}
+    \caption{Riepilogo dei dati di calibrazione con stima del tempo di acquisizione $\widehat{t}$ e tensione limite $V_0$.}
+    \label{tab:calibration_results}
+\end{table}
+
+\item Si noti che i valori di \( V_0 \) sono, di per sé, casuali. Infatti, la ripetizione dello stesso test produce valori differenti di \( V_0 \). È possibile derivare una formula che stimi il valore medio limite dei valori di \( V_0 \), indicato come \( \mu_{V_0} \), come funzione del valore di forza di riferimento, \( F^* \). Questa relazione può essere ottenuta tramite regressione lineare delle coppie \( (F^*, V_0) \). La formula avrà la seguente forma:
+\begin{equation}
+\label{eq:regression}
+\mu_{V_0} = m F^* + b
+\end{equation}
+
+Determinare i valori di \( m \) e \( b \).
+
+\NotionDivider
+
+Usando il comando \texttt{polyfit} di MATLAB con opzione \emph{degree}$=1$, abbiamo trovato che
+\[
+m = -0.000407713~\text{V/N} \,, \qquad b = -2.8934 \cdot 10^{-5} ~\text{V}\,.
+\]
+
+La retta di regressione così definita è mostrata in Figura~\ref{fig:calib31-rego}.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width = 0.5\textwidth]{calib-31/rego}
+\caption{Retta di regressione lineare.}
+\label{fig:calib31-rego}
+\end{figure}
+
+\item Tuttavia, l'interesse reale è una formula in cui, dato un valore di tensione \( V_0 \), viene fornita una stima della \emph{vera} forza corrispondente \( F \). Questa formula è chiamata funzione di trasferimento lineare e può essere ottenuta risolvendo la seguente equazione:
+\begin{equation}
+\label{eq:tildeF1}
+\tilde{F} = \frac{V_0 - b}{m}   
+\end{equation}
+
+Il simbolo sopra \( F \) indica che, per un dato \( V_0 \), la formula sopra riportata non produce il valore reale di \( F \), ma solo una stima. Questo è dovuto alla natura casuale del processo di misura (si noti che, in linea di principio, lo stesso \( V_0 \) potrebbe corrispondere a diversi possibili valori di \( F \)). 
+
+Ora si desidera calcolare una stima dell'incertezza associata alla stima \( \tilde{F} \). Vale a dire, si desidera trovare \( U \) in modo che, per ogni \( V_0 \), la forza corrispondente rientri nell'intervallo \( \tilde{F} \pm U \).
+
+\begin{enumerate}
+\item Un primo approccio consiste nel definire \( U \) come la massima differenza assoluta tra \( F \) e \( F^* \) per tutti i 16 casi di calibrazione. Quale sarebbe il valore di \( U \) in questo caso?
+
+\item Un secondo approccio consiste nel riferirsi agli intervalli di confidenza. Per una distribuzione Gaussiana perfetta, il 95\% delle letture ricade nell'intervallo \( \mu \pm 2\sigma \). Secondo la teoria della regressione lineare, possiamo stimare \( U \) al 95\% di confidenza come:
+\begin{equation}
+\label{eq:gasu}
+2s_f \quad \text{dove} \quad s_f^2 = \frac{1}{N-2} \sum_N \left( \frac{V_0 - b}{m} - F^* \right)^2\,,
+\end{equation}
+
+dove \( N \) è il numero totale di campioni.
+
+Quale sarebbe il valore di \( U \) in questo caso? Cosa si potrebbe dedurre confrontando i valori di \( U \) ottenuti con i due metodi?
+
+\emph{\textbf{Nota:} in linea di principio, la formula sopra riportata è ragionevole solo per popolazioni molto ampie, il che non è il caso qui. Per popolazioni moderate, un metodo migliore è disponibile, che si basa sulla distribuzione $t$ di Student. Questo metodo non verrà trattato nel corso base di Fluid Labs.}
+
+\end{enumerate}
+
+\NotionDivider
+
+Nel primo caso calcoliamo $U_1$ come
+\begin{equation}
+\label{eq:UUU}
+U_1=\max \left| F^*- \frac{V_0-b}{m}  \right|=0.01342~\text{N}\,.
+\end{equation}
+
+Nel secondo caso, calcoliamo $U_2$ come
+\begin{equation}
+\label{eq:UUUUU}
+U_2=2\sqrt{\frac{1}{N-2} \sum_N \left( \frac{V_0 - b}{m} - F^* \right)^2}=0.01124~\text{N}\,.
+\end{equation}
+
+Il primo approccio rappresenta una stima conservativa dell'incertezza, poiché considera la massima deviazione possibile tra \( \tilde{F} \) e \( F^* \). Tuttavia, potrebbe sovrastimare \( U \) in presenza di outlier nei dati.
+
+Invece il secondo approccio, basato sugli intervalli di confidenza, è più robusto poiché tiene conto della distribuzione complessiva dei residui. Tuttavia, non avendo usato un campione ampio non possiamo scartare la prima stima e favorire solamente la seconda.
+
+In ogni caso, abbiamo differenze nell'incertezza di circa \( 0.002 \, \text{N} \) tra i due metodi, considerabile accettabile nel nostro caso.
+\end{itemize}
+
+\newpage
+
+\section*{Quesito 2}
+
+Si può stimare la risoluzione della cella di carico? Si ricorda che la risoluzione di uno strumento è la più piccola variazione che può essere misurata. La risoluzione stabilisce i possibili valori di output della cella di carico, con un andamento \emph{a gradini}. Qual è la risoluzione della cella di carico in termini di tensione? E in termini di forza?
+
+\NotionDivider
+
+La risoluzione in tensione è stata stimata analizzando i dati grezzi di \( V \) (tensione) forniti per ciascun test. L'approccio utilizzato si basa sui seguenti passaggi:
+\begin{itemize}
+    \item I dati grezzi sono stati divisi in finestre temporali di durata pari a 5 secondi.
+    \item Per ciascuna finestra, è stata calcolata la media dei valori di tensione.
+    \item Le differenze assolute tra le medie delle finestre consecutive sono state calcolate, e il valore minimo tra queste differenze è stato considerato come la risoluzione per il test.
+    \item La risoluzione media in tensione è stata calcolata come la media delle risoluzioni ottenute per i 16 test.
+\end{itemize}
+
+Il risultato ottenuto per la risoluzione in tensione è:
+\[
+\Delta V_0 = 6.5512 \cdot 10^{-7}~ \text{V}\,.
+\]
+La risoluzione in forza è stata calcolata utilizzando la funzione di trasferimento lineare:
+\[
+\Delta \tilde{F} = \frac{\Delta V_0}{m}=0.00161~\text{N}\,.
+\]
+
+Il termine \(b\) non è considerato in quanto non influisce sulle variazioni, essendo una costante.
+
+I risultati ottenuti indicano che la cella di carico ha una risoluzione molto alta in termini di tensione (\( \Delta V_0 \)) e una risoluzione pratica accettabile in termini di forza (\( \Delta \tilde F \)). Questi valori sono in linea con le aspettative per strumenti di misura di alta precisione.
+
+
+
+

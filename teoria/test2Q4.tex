@@ -1,0 +1,93 @@
+%!TEX root = ../main.tex
+
+\section{Quesito 4}
+
+\subsection*{Valutazione della convergenza numerica della soluzione CFD}
+
+\vspace{0.5em}
+
+Valutare la convergenza numerica della soluzione CFD. Ciò richiede, da un lato, di verificare che la simulazione CFD sia convergente rispetto all'algoritmo di soluzione e, dall'altro, che la soluzione sia \emph{grid independent}.
+
+La convergenza rispetto all'algoritmo di soluzione si ottiene attraverso il monitoraggio dei residui normalizzati, la stabilità dei valori puntuali e le correzioni massime/minime applicate.
+
+Lo studio di indipendenza dalla griglia deve essere effettuato sulla base di adeguati parametri target. Si noti che i parametri target sono decisi dall'utente, e tutte le grandezze oggetto di indagine devono dimostrarsi \emph{grid-independent} (o, meglio, che l'incertezza residua dovuta a ulteriori raffinamenti della mesh rimanga entro limiti accettabili).
+
+\NotionDivider
+
+\begin{figure}[H]
+\centering
+\includegraphics[width = 0.45\textwidth]{convM1}\quad
+\includegraphics[width = 0.45\textwidth]{convM2}\\
+\includegraphics[width = 0.45\textwidth]{convM3}
+\caption{Andamento dei residui all'aumentare della risoluzione della mesh.}
+\label{fig:convcomp}
+\end{figure}%
+\FloatBarrier%
+
+\begin{figure}[H]
+\centering
+\includegraphics[width = 0.6\textwidth]{r2f11}
+\caption{Confronto della pressione $P^*$ al centro della tubazione.}
+\label{fig:r2f11}
+\end{figure}%
+\FloatBarrier%
+
+\begin{figure}[H]
+\centering
+\includegraphics[width = 0.6\textwidth]{r2f12}
+\caption{Confronto di $W/W_b$ a $z=7.5$ m.}
+\label{fig:r2f12}
+\end{figure}%
+\FloatBarrier%
+
+\begin{figure}[H]
+\centering
+\includegraphics[width = 0.6\textwidth]{r2f13}
+\caption{Confronto di $w^+$ a $z=7.5$ m, ascissa in scala logaritmica.}
+\label{fig:r2f13}
+\end{figure}%
+\FloatBarrier%
+
+\begin{figure}[H]
+\centering
+\includegraphics[width = 0.6\textwidth]{r2f14}
+\caption{Confronto di $\tau_{\text{visc}}/\tau_w$ a $z=7.5$ m.}
+\label{fig:r2f14}
+\end{figure}%
+\FloatBarrier%
+
+\begin{figure}[H]
+\centering
+\includegraphics[width = 0.6\textwidth]{r2f15}
+\caption{Confronto di $\tau_{\text{Re}}/\tau_w$ a $z=7.5$ m.}
+\label{fig:r2f15}
+\end{figure}%
+\FloatBarrier%
+
+\begin{figure}[H]
+\centering
+\includegraphics[width = 0.6\textwidth]{r2f16}
+\caption{Confronto di $f$.}
+\label{fig:r2f16}
+\end{figure}%
+\FloatBarrier%
+
+\begin{figure}[H]
+\centering
+\includegraphics[width = 0.6\textwidth]{r2f17}
+\caption{Confronto di $k/W_b^2$.}
+\label{fig:r2f17}
+\end{figure}%
+\FloatBarrier%
+
+\begin{figure}[H]
+\centering
+\includegraphics[width = 0.6\textwidth]{r2f18}
+\caption{Confronto di $\varepsilon R/W_b^3$.}
+\label{fig:r2f18}
+\end{figure}%
+\FloatBarrier%
+
+Notiamo che $f$ converge verso il valore teorico di Blausius $0.316\text{Re}^{-0.25}=0.0191$.
+
+

@@ -1,0 +1,293 @@
+%!TEX root = ../main.tex
+
+\chapter{Laminar oil transport in a pipeline}
+\thispagestyle{empty}
+
+\section*{Introduzione}
+
+\subsection*{Descrizione del caso}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width = 0.8\textwidth]{sketch}
+\caption{Rappresentazione schematica.}
+\label{fig:sketch-1}
+\end{figure}%
+\FloatBarrier%
+
+Il primo test è il flusso laminare di olio in una condotta (Figura \ref{fig:sketch-1}). Se la condotta è sufficientemente lunga, ci si aspetta che il flusso sia completamente sviluppato, e questo stato deve essere riprodotto nella soluzione CFD. Tuttavia, se la condizione al contorno di ingresso è un profilo di velocità uniforme, il flusso raggiungerà lo stato completamente sviluppato solo asintoticamente. Deve quindi essere introdotto un criterio pratico per identificare la regione del tubo in cui il flusso può essere trattato come completamente sviluppato. Il flusso laminare completamente sviluppato in un tubo ammette una soluzione analitica, che è il flusso di Poiseuille cilindrico:
+
+\begin{align}
+	w (r, \theta, z) &= w(z) = - \frac{1}{4\mu} \frac{dp_e}{dz} (R^2 - r^2) \quad u(r, \theta, z) = 0 \quad v(r, \theta, z) = 0 \label{eq:poiseuille-vel} \\
+	\frac{dp_e}{dz} &= \text{cost} < 0 \label{eq:pressure-grad} \\
+	\tau_{rz}(r, \theta, z) &= -2\mu \frac{1}{2} \left( \frac{\partial v}{\partial z} + \frac{\partial w}{\partial r} \right) = -\mu \frac{dw}{dr} = - \frac{dp_e}{dz} \frac{r}{2} \label{eq:shear-stress}
+\end{align}
+
+dove $\mu$ è la viscosità dinamica del fluido, $R$ è il raggio interno del tubo, $u, v, w$ sono le componenti di velocità lungo le direzioni $\theta, r, z$ (Figura \ref{fig:sketch-1} e Figura \ref{fig:sketch-2}), $p_e$ è la pressione in eccesso (ovvero, la parte di pressione che non è bilanciata dalla gravità), e $\tau_{rz}$ è l'unico termine di sforzo di taglio non nullo.
+
+\subsection*{Simulazione numerica}
+
+Viene risolta la formulazione stazionaria delle equazioni di Navier-Stokes. Le condizioni al contorno applicate sono ingresso, uscita, parete e asse (altre condizioni al contorno potrebbero essere applicate). Il carico computazionale delle simulazioni può essere ridotto sfruttando la simmetria assiale del problema, che verrà quindi simulato come 2D attraverso un dominio avente la forma di un settore circolare, come mostrato in Figura \ref{fig:sketch-2}. All'ingresso, viene imposto un profilo di velocità $z$ uniforme pari a $W_b$ (bulk velocity), mentre le componenti di velocità $r$ e $\theta$ sono poste a zero. All'uscita, la pressione in eccesso è specificata a un dato valore, che potrebbe essere zero. Le pareti sono assunte fisse e viene impostata una condizione di aderenza (no-slip) ai bordi, ovvero la velocità del fluido è zero alle pareti. Essendo nel caso laminare, lo sforzo di taglio a parete è valutato semplicemente come la velocità assiale nelle celle vicine alla parete divisa per la sua distanza dalla parete e moltiplicata per la viscosità del fluido. Questo insieme di condizioni al contorno risulta in un campo di moto in via di sviluppo che, partendo dalla distribuzione uniforme imposta alla sezione di ingresso, raggiunge una configurazione completamente sviluppata a una certa distanza a valle di essa.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width = 0.8\textwidth]{bcs}
+\caption{Dominio e condizioni al contorno.}
+\label{fig:sketch-2}
+\end{figure}%
+\FloatBarrier%
+
+\subsection*{Configurazione del problema}
+
+\begin{itemize}
+	\item Diametro del tubo $= 150~\text{mm}=0.15~\text{m}$;
+	\item Bulk velocity $W_b = 0.45~\text{m/s}$;
+	\item Fluido $=$ petrolio greggio pesante con densità $\rho = 910~\text{kg/m}^3$ e viscosità cinematica $\nu = 3.5 \cdot 10^{-4}~\text{m}^2/\text{s}$.
+\end{itemize}
+
+\section{Quesito 1}
+
+Verificare che le condizioni di prova indicate corrispondano a un \textbf{flusso laminare}. Questo si ottiene calcolando il numero di Reynolds di bulk $\text{Re}_b$ e confrontandolo con il valore soglia di circa 2000.
+
+\NotionDivider
+
+Il flusso è laminare perché 
+\begin{equation}
+\label{eq:Re-b-1}
+\text{Re}_b = \frac{D\cdot W_b}{\nu}=\frac{0.15 \cdot 0.45}{3.5 \cdot 10^{-4}}=192.86<2000\ .
+\end{equation}
+
+\newpage
+
+\section{Quesito 2}
+    
+Impostare la lunghezza del dominio, $L$, in modo tale che si possano raggiungere condizioni di \textbf{flusso completamente sviluppato} a partire dal profilo di velocità uniforme imposto all'ingresso. 
+    
+Nota che l'obiettivo non è determinare con precisione la lunghezza richiesta per lo sviluppo del flusso (spesso chiamata ``lunghezza d'ingresso'' o \emph{entry length}), che è, in linea di principio, infinita. Invece, lo scopo è identificare una regione del dominio che, in pratica, possa essere considerata rappresentativa dello stato completamente sviluppato e possa quindi essere utilizzata per estrarre i risultati rilevanti della soluzione (profilo di velocità assiale, profilo degli sforzi di taglio, gradiente idraulico).
+
+\vspace{0.3em}
+    
+\emph{\textbf{Suggerimento:} non sottovalutare l'impatto qualitativo! A volte un criterio qualitativo è più efficace di uno quantitativo troppo astratto.}
+
+\vspace{0.3em}
+
+\emph{\textbf{Suggerimento:} cerca di guardare a variabili che abbiano un chiaro significato fisico e siano più direttamente comprensibili rispetto a metriche che, sebbene significative, potrebbero sembrare oscure. Ricorda che la comprensione intuitiva del flusso, corroborata dalla conoscenza della meccanica dei fluidi, è di massima importanza nella CFD applicata.}
+
+\vspace{0.3em}
+
+\emph{\textbf{Suggerimento:} poiché lo stato completamente sviluppato viene raggiunto asintoticamente, qualunque sia la regione del tubo (o sezione del tubo) scelta, a rigor di logica, la soluzione CFD non corrisponderà al flusso completamente sviluppato in nessun caso. Quindi, la soluzione CFD sarà rappresentativa di un flusso completamente sviluppato al netto di una data variabilità (o, se preferisci, incertezza). L'obiettivo è avere questa variabilità entro limiti accettabili per lo scopo dello studio -- la sfida chiave è capire cosa significhi ``limiti accettabili''!}
+
+\vspace{0.3em}
+
+\emph{\textbf{Suggerimento:} in letteratura sono riportate molte formule per stimare la lunghezza d'ingresso del flusso laminare in un tubo. Cerca di trovarne alcune e confrontale con i tuoi risultati CFD. Fai attenzione a verificare se il confronto è coerente: per esempio, il significato di ``lunghezza d'ingresso'' nelle formule letterarie è lo stesso che stai attribuendo a questo parametro nei tuoi calcoli? Inoltre, se riesci a trovare molte formule che forniscono stime diverse, non limitarti a quelle che forniscono la corrispondenza migliore con i tuoi calcoli; chiediti invece ``perché queste formule forniscono stime diverse per gli stessi parametri? Perché alcune formule concordano con i miei risultati CFD e altre no?''}
+
+\NotionDivider
+
+Per iniziare la prima simulazione, scegliamo arbitrariamente come lunghezza $L=2.25~\text{m}$ e costruiamo una mesh di 100 celle in direzione assiale e 10 in direzione radiale. Osservando il profilo della velocità assiale in Figura~\ref{fig:contour1} possiamo notare che le bande di velocità si stabilizzano a circa \emph{metà} della lunghezza. 
+
+\begin{figure}[H]
+\centering
+\includegraphics[width = 0.85\textwidth]{beaa1}
+\caption{Colourplot velocità assiale.}
+\label{fig:contour1}
+\end{figure}%
+\FloatBarrier%
+
+Per capire quando lo sviluppo si arresta più precisamente studiamo l'andamento riportato in Figura~\ref{fig:m1}. Possiamo notare che da circa la cella 65 in poi, la velocità assiale lungo tre linee (linea di celle lungo l'asse di simmetria, terza fila di celle, quinta fila di celle) è costante.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width = 0.8\textwidth]{m1}
+\caption{Andamento di DWDZ.}
+\label{fig:m1}
+\end{figure}%
+\FloatBarrier%
+
+A prova di ciò, plottando la velocità in direzione radiale in corrispondenza delle 65esime celle in poi, notiamo che non c'è \emph{praticamente} nessun cambiamento. Si veda Figura~\ref{fig:w1}.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width = 0.8\textwidth]{w1}
+\caption{Andamento della velocità lungo l'asse radiale.}
+\label{fig:w1}
+\end{figure}%
+\FloatBarrier%
+
+Dato che siamo interessati alla \emph{entry length} (e non al numero di cella), in Figura~\ref{fig:m2} abbiamo riscalato l'ascissa del grafo di DWDZ: la \emph{entry length} $L_e$ corrisponde a circa 1.4/1.5 m.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width = 0.8\textwidth]{m2}
+\caption{Andamento di DWDZ.}
+\label{fig:m2}
+\end{figure}%
+\FloatBarrier%
+
+Dal punto di vista teorico, abbiamo la formula
+\begin{equation}
+\label{eq:l_e=2L}
+L_e=c\cdot \text{Re}\cdot D\ ,
+\end{equation}
+
+dove la costante $c$ può essere uguale a 0.05 (Langhaar, 1942, \emph{Steady flow in the transition length of a straight tube}) oppure a 0.06 (Shah \& London, 1978, \emph{Laminar Flow Forced Convection in Ducts}). Essendo il numero di Reynolds non inferiore a 100, la relazione è lineare e il parametro $c$ cambia a seconda di cosa si intenda per \emph{completamente sviluppato}: si potrebbe definire il flusso sviluppato quando la velocità al centro (oppure su un'altra linea) raggiunge il 99\% (oppure il 98\%) del valore asintotico parabolico. Come suggerito, questa è un'incertezza accettabile ai fini pratici.
+
+Nel primo caso otteniamo $L_e=1.4464$ m, mentre nel secondo, più conservativo, otteniamo $L_e=1.7357$ m. Entrambe le formule empiriche confermano la nostra analisi. Perciò, decidiamo di scegliare una lunghezza totale di circa il doppio della \emph{entry length}: $L=2.5$ m.
+
+\section{Quesito 3}
+
+Verificare se la soluzione CFD è \textbf{fisicamente sensata} da un punto di vista qualitativo, cioè controllare se c'è qualcosa di strano nei risultati ispezionando i grafici a colori (colour plots) o le mappe vettoriali.
+
+\NotionDivider
+
+Come prima cosa, riguardando la Figura~\ref{fig:contour1} e il vector plot di Figura~\ref{fig:vect-manu}, ossserviamo che il profilo di velocità non presenta anomalie: 
+\begin{itemize}
+    \item non ci sono variazioni improvvise ma l'andamento è regolare e continuo, fino ad assestarsi nella regione di \emph{fully developed flow};
+    \item la velocità è massima al centro del tubo cioè sull'asse di simmetria e diminuisce andando verso la parete, fino ad annullarsi per le condizioni al contorno.
+\end{itemize}
+
+Pertanto, il flusso corrisponde al caso laminare.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width = 0.6\textwidth]{vector-manu}
+\caption{Vector plot velocità.}
+\label{fig:vect-manu}
+\end{figure}%
+\FloatBarrier%
+
+In aggiunta, osserviamo anche il colour plot della pressione in Figura~\ref{fig:press-manu}: diminuisce gradualmente. Questo è in accordo con l'Equazione~\eqref{eq:pressure-grad}: il fluido viene \emph{spinto} proprio grazie a questa differenza di pressione.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width = 0.8\textwidth]{p-manu}
+\caption{Colourplot pressione.}
+\label{fig:press-manu}
+\end{figure}%
+\FloatBarrier%
+
+\section{Quesito 4}
+
+Valutare la convergenza numerica della soluzione CFD. Questo richiede, da un lato, di verificare che la simulazione CFD debba essere considerata convergente rispetto all'algoritmo risolutivo e, dall'altro, che la mesh sia sufficientemente fine da mantenere l'errore di discretizzazione entro limiti accettabili.
+
+La convergenza rispetto all'algoritmo si ottiene attraverso il monitoraggio dei residui normalizzati su tutto il campo e dei valori delle sonde (\emph{probe}), impostando un adeguato numero massimo di iterazioni e un idoneo criterio di convergenza globale.
+
+Lo studio di sensibilità della griglia (spesso chiamato \emph{grid independence study}, ma nota che nessuna soluzione è indipendente dalla griglia in senso stretto) deve essere condotto sulla base di idonei parametri target. Nota che i parametri target sono decisi dall'utente, e tutte le quantità oggetto di indagine devono essere dimostrate indipendenti dalla griglia.
+
+\vspace{0.3em}
+
+\emph{\textbf{Suggerimento:} come per il raggiungimento dello stato completamente sviluppato, in linea di principio la convergenza rispetto all'algoritmo e l'indipendenza dalla griglia si ottengono asintoticamente, richiedendo un numero infinito di iterazioni (criterio di convergenza globale uguale a zero) e celle con dimensioni infinitesimali. Quindi, l'obiettivo è identificare il criterio di convergenza globale e le dimensioni delle celle in modo tale che la variabilità residua (o, se preferisci, l'incertezza) sia entro limiti accettabili. Ma, ancora una volta, la sfida chiave è capire cosa significhi limiti accettabili!}
+
+\vspace{0.3em}
+
+\emph{\textbf{Suggerimento:} come progetti il pattern della mesh per questo caso? Perché? Una volta definita la prima mesh, come definisci le (almeno) altre due per condurre lo studio di indipendenza della griglia?}
+
+\NotionDivider
+
+La prima mesh, Mesh 1, come già citato ha 100 elementi lungo l'asse e 10 elementi in direzione radiale, per un totale di 1000 elementi. Il plot dei residui di Figura~\ref{fig:res1} mostra che all'aumentare del numero di iterazioni le variabili di interesse convergono, dato che il residuo raggiunge (e oltrepassa) la soglia di $10^{-3}$. Il numero totale di iterazioni è 375.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width = 0.4\textwidth]{res1}
+\caption{Andamento dei residui.}
+\label{fig:res1}
+\end{figure}%
+\FloatBarrier%
+
+Successivamente, abbiamo raffinato la nostra mesh in maniera uniforme in entrambe le direzioni: Mesh 2 ha $20\times 200 = 4000$ elementi mentre Mesh 3 ha $30\times 300 = 9000$ elementi.
+
+All'aumentare del numero di elementi aumenta anche il numero di iterazioni necessarie per raggiungere la convergenza (375 per Mesh 1, 879 per Mesh 2, 1553 per Mesh 3), mentre \textbf{il trend dei residui si mantiene simile}, il che suggerisce l'indipendenza della soluzione dalla mesh.
+
+Inoltre, abbiamo confrontato le variabili \texttt{W1}, \texttt{P} e \texttt{V1} tra le mesh e le Figure~\ref{fig:comp-W1},~\ref{fig:comp-P},~\ref{fig:comp-V1} confermano l'indipendenza della mesh.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width = 0.8\textwidth]{comp-W1}
+\caption{Confronto di \texttt{W1} al centro.}
+\label{fig:comp-W1}
+\end{figure}%
+\FloatBarrier%
+
+\begin{figure}[H]
+\centering
+\includegraphics[width = 0.8\textwidth]{comp-P}
+\caption{Confronto di \texttt{P1} al centro.}
+\label{fig:comp-P}
+\end{figure}%
+\FloatBarrier%
+
+\begin{figure}[H]
+\centering
+\includegraphics[width = 0.8\textwidth]{comp-V1}
+\caption{Confronto di \texttt{V1} al centro.}
+\label{fig:comp-V1}
+\end{figure}%
+\FloatBarrier%
+
+\newpage
+
+\section{Quesito 5}
+
+Validare la soluzione CFD nella regione completamente sviluppata rispetto alla soluzione analitica del flusso di Poiseuille. Poiché esiste una soluzione analitica per questo caso, questa validazione è chiamata \emph{benchmarking}, e il suo scopo è semplicemente quello di auto-verificare la corretta implementazione del caso, così come la convergenza numerica. La validazione della soluzione CFD deve essere fatta in termini di profili di velocità $w(r)$ e sforzo di taglio $\tau_{rz}(r)$, così come in termini di gradiente di pressione (in eccesso) $dp_e/dz$.
+
+Quindi, la soluzione analitica presentata a lezione, e richiamata nella sezione Descrizione del caso, deve essere manipolata in modo che tutte le quantità siano espresse in funzione della velocità media (\emph{bulk}), $W_b$, che è la quantità nota nello studio CFD (poiché è il parametro imposto alla sezione di ingresso).
+
+\NotionDivider
+
+Per il problema in analisi esiste una soluzione analitica con la quale si può confrontare la soluzione numerica trovata.
+
+Poichè in pratica conosciamo solamente la velocità di bulk, cerchiamo di manipolare la soluzione del flusso di Poiseuille in modo da esprimere $\frac {d p_e}{d z}$ e $w(z)$ in termini di $W_b$. Abbiamo
+\[
+W_b = -\frac{1}{8\mu} \frac{d p_e}{d z} R^2\ ,
+\]
+
+da cui si ricava che il \textbf{gardiente di pressione} è
+\[
+\frac{d p_e}{d z} = -\frac{8\mu W_b}{R^2}\ .
+\]
+
+Utilizzando questa espressione, le equazioni originali possono essere riformulate come segue:
+\begin{enumerate}
+    \item \textbf{Velocità assiale}: è data da
+    \[
+    w(r) = 2W_b \left( 1 - \frac{r^2}{R^2} \right)\ .
+    \]
+
+    \item \textbf{Velocità radiali e tangenziali}: nel flusso puramente assiale non ci sono componenti radiali o tangenziali perciò
+    \[
+    u(r, \theta, z) = v(r, \theta, z) = 0\ .
+    \]
+
+    \item \textbf{Sforzo di taglio}: è dato da
+    \[
+    \tau_{rz}(r) = \mu\frac{dw}{dr}= \frac{4\mu W_b}{R^2} r\ .
+    \]
+\end{enumerate}
+
+I confronti di Figure~\ref{fig:wr},~\ref{fig:dpedz},~\ref{fig:tau} confermano la correttezza della nostra analisi numerica anche dal punto di vista teorico.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width = 0.6\textwidth]{wr}
+\caption{Confronto della velocità assiale.}
+\label{fig:wr}
+\end{figure}%
+\FloatBarrier%
+
+\begin{figure}[H]
+\centering
+\includegraphics[width = 0.6\textwidth]{dpedz}
+\caption{Confronto del gradiente di pressione.}
+\label{fig:dpedz}
+\end{figure}%
+\FloatBarrier%
+
+\begin{figure}[H]
+\centering
+\includegraphics[width = 0.6\textwidth]{tau}
+\caption{Confronto degli sforzi di taglio.}
+\label{fig:tau}
+\end{figure}%
+\FloatBarrier%
+
+
+

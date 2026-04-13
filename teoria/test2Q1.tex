@@ -1,0 +1,102 @@
+%!TEX root = ../main.tex
+
+\chapter{Turbulent water transport in a hydraulically smooth pipeline}
+\thispagestyle{empty}
+
+\section*{Introduzione}
+
+\subsection*{Descrizione del caso}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width = 0.5\textwidth]{miao}
+\caption{Rappresentazione schematica.}
+\label{fig:sketch-12}
+\end{figure}%
+\FloatBarrier%
+
+Il secondo test è il flusso turbolento di acqua in una condotta idraulicamente liscia (Figura \ref{fig:sketch-12}). A causa dell'intrinseca non stazionarietà della turbolenza, le considerazioni vengono effettuate esclusivamente in termini di media temporale. 
+
+Se la condotta è sufficientemente lunga, ci si aspetta che il flusso sia completamente sviluppato, e questo stato deve essere riprodotto nella soluzione CFD. Tuttavia, se la condizione al contorno di ingresso è un profilo di velocità uniforme, il flusso raggiungerà lo stato completamente sviluppato solo asintoticamente. Deve quindi essere introdotto un criterio pratico per identificare la regione del tubo in cui il flusso può essere trattato come completamente sviluppato. 
+
+Le grandezze di interesse sono le perdite per attrito lungo la condotta, così come i profili radiali della velocità assiale, degli sforzi di taglio (viscosi e turbolenti) e dei parametri di turbolenza.
+
+A differenza del caso precedente, in quello attuale non è disponibile alcuna soluzione analitica; pertanto, non è possibile alcun benchmarking. Invece, per la validazione del setup numerico, vengono utilizzati dati sperimentali e correlazioni empiriche.
+
+
+\subsection*{Simulazione numerica}
+
+In questo laboratorio, PHOENICS viene utilizzato per simulare il flusso risolvendo le equazioni di Reynolds-Averaged Navier-Stokes (RANS) accoppiate con diversi modelli di turbolenza a viscosità turbolenta, sia nell'ambito delle \emph{wall function} che in quello di \emph{low-Reynolds}.
+
+Inizialmente, la scelta ricadrà sul modello di turbolenza $k$-$\varepsilon$ standard con l'impiego della wall function di equilibrio di Launder e Spalding (1974).
+
+Il carico computazionale delle simulazioni può essere ridotto sfruttando l'assialsimmetria del campo di moto medio, che sarà quindi simulato come 2D attraverso un dominio avente la forma di un settore circolare, come mostrato in Figura \ref{fig:sketch-22}.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width = 0.8\textwidth]{bcs}
+\caption{Dominio e condizioni al contorno.}
+\label{fig:sketch-22}
+\end{figure}%
+\FloatBarrier%
+
+Le condizioni al contorno impiegate per simulare il secondo caso di studio sono: ingresso, uscita, pareti solide e asse.
+\begin{itemize}
+    \item All'ingresso, viene imposto un profilo uniforme di velocità lungo $z$ di valore $W_b$, mentre le componenti di velocità lungo $r$ e $\theta$ sono specificate come nulle. Non si assume alcuna turbolenza all'ingresso; questo si ottiene impostando il parametro di intensità di turbolenza \texttt{TI} a 0.
+
+    \item All'uscita, viene imposta una $P^*$ esterna nulla.
+
+    \item Alle pareti solide, a causa della condizione di no-slip, la velocità del fluido è zero. 
+
+    Nel contesto dei Volumi Finiti con disposizione staggered-grid, solo la velocità lungo $r$ viene imposta alla parete. La condizione di no-slip per la velocità $z$ viene imposta indirettamente.
+
+    \begin{itemize}
+        \item Da un lato, il flusso avvettivo della variabile $W$ attraverso le facce delle celle vicine alla parete è impostato a zero.
+
+        \item Dall'altro, il flusso diffusivo della variabile $W$ attraverso le facce delle celle vicine alla parete (ovvero, la forza di taglio a parete) è specificato correlando lo sforzo di taglio a parete alla velocità assiale nelle celle adiacenti alla parete tramite la wall function di equilibrio di Launder e Spalding (1974).
+    \end{itemize}
+
+    \emph{\textbf{Nota:} poiché viene adottato l'approccio wall function, la distanza adimensionale dalla parete $y^+$ dei primi nodi della griglia deve essere maggiore di 30 (e generalmente inferiore a circa 130). Tale distanza adimensionale dalla parete $y^+$ può essere calcolata solo a posteriori.}
+\end{itemize}
+
+\subsection*{Configurazione del problema}
+
+\begin{itemize}
+    \item Diametro del tubo $= 0.10~\text{m}$;
+    \item Bulk-mean velocity $W_b = 0.75~\text{m/s}$;
+    \item Fluido $=$ acqua a $20^\circ$C, trattata come incompressibile ($\rho = 998.23~\text{kg/m}^3$, $\nu = 10^{-6}~\text{m}^2/\text{s}$).
+\end{itemize}
+
+\subsection*{Variabili PHOENICS utili}
+
+\begin{itemize}
+    \item \texttt{YPLS}$=y^+$;
+    \item \texttt{STRS}$=\tau_w/\rho$;
+    \item \texttt{ENUT}$=\mu_t/\rho$;
+    \item \texttt{KE}$=k$;
+    \item \texttt{EP}$=\varepsilon$.
+\end{itemize}
+
+\section{Quesito 1}
+
+Verificare che le condizioni di test indicate corrispondano a un \textbf{flusso turbolento}. Questo si ottiene calcolando il numero di Reynolds medio $\text{Re}_b$ e confrontandolo con il valore soglia di circa 2000.
+
+\NotionDivider
+
+Il flusso è turbolento perché
+\begin{equation}
+\label{eq:re2}
+\text{Re}_b=\frac{D\cdot W_b}{\nu}=\frac{0.1\cdot 0.75}{10^{-6}}=75000\gg 2000\ .  
+\end{equation}
+
+
+
+
+
+
+
+
+
+
+
+

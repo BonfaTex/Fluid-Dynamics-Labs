@@ -1,0 +1,281 @@
+%!TEX root = ../main.tex
+
+\chapter{Analysis of the velocity field in the wake of a circular cylinder}
+\thispagestyle{empty}
+
+\section*{Descrizione e obiettivi del test case}
+
+L'obiettivo di questo laboratorio è analizzare il campo di velocità attorno a un cilindro in un flusso all'interno di un canale d'acqua, concentrandosi sulla \emph{wake region}.
+
+Si fa riferimento ai dati sperimentali ottenuti attraverso la tecnica della \textbf{Particle Streak Velocimetry (PSV)}, che consiste essenzialmente nell'inseminare il flusso con piccole particelle e riprendere un video del piano illuminato da un fascio di luce. La telecamera ha un tempo di esposizione elevato, inteso come la durata temporale di un singolo fotogramma, in modo che ogni particella lasci una scia (\emph{streak}) sull'immagine, come esemplificato in Figura~\ref{fig:test4esempioPSV}. Le immagini vengono poi elaborate per ottenere il campo di velocità.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width = 0.8\textwidth]{test4img/img1}
+\caption{Immagine di esempio dell'esperimento di PSV.}
+\label{fig:test4esempioPSV}
+\end{figure}
+
+Nel caso di studio proposto, il numero di Reynolds del cilindro $\text{Re}_D=DU_{\infty}/U$ rientra nell'intervallo del \textbf{regime sub-critico}; pertanto, non sarà sorprendente notare che il flusso si separa a una certa distanza dal punto di ristagno anteriore, causando una zona di ricircolo dietro di esso, e che si crea una scia turbolenta oscillante dovuta al distacco di due vortici controrotanti.
+
+Lo schema dell'esperimento è riportato in Figura~\ref{fig:test4sketchPSV}. Il flusso va da destra a sinistra per essere coerente con la posizione del sistema di acquisizione PSV nel setup del canale d'acqua. L'inquadratura della telecamera, che costituisce il campo di misura, è un piano verticale nella sezione mediana del canale. Il sistema di coordinate dell'acquisizione PSV è $(X,Y)$, come indicato nella figura.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width = \textwidth]{test4img/img2}
+\caption{Rappresentazione schematica dell'esperimento.}
+\label{fig:test4sketchPSV}
+\end{figure}
+
+\section*{Input data}
+
+I dati dell'esperimento sono riportati in Tabella~\ref{tab:tab4-dati}.
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{clcc}
+        \toprule
+        \textbf{Symbol} & \textbf{Parameter} & \textbf{Value} & \textbf{Units}  \\
+        \midrule
+        $B$ & Width of the chanell & 0.5 & m    \\
+        $D$ & Diameter of the cylinder & 0.06 & m \\
+        $f_s$ & Sampling frequency & 50 & Hz \\
+        $h$ & Water level in the channel upstream of the cylinder & 0.42 & m \\
+        $h_b$ & Distance of the cylinder wall from the channel bottom & 0.18 & m \\
+        $Q$ & Volumetric flow rate of water & 35 & l/s \\
+        res & Resolution of the images & 3040 & px/m \\
+        $\rho$ & Density of water & 998 & kg/m$^3$  \\
+        $\mu$ & Dynamic viscosity of water & 0.001 & Pa$\cdot$s \\
+        \bottomrule
+    \end{tabular}
+    \caption{Dati dell'esperimento.}
+    \label{tab:tab4-dati}
+\end{table}
+
+Per la post-elaborazione dei dati PSV, l'inquadratura è stata suddivisa in una griglia regolare di $30 \times 23$ celle uniformi lungo le direzioni $X$ e $Y$. Il numero di passi temporali è 1499, e la durata di ciascuno di essi è pari a $1/f_s$. Il set completo dei dati di acquisizione è fornito nel workspace MATLAB \texttt{PSVdata.mat}, che include le variabili mostrate in Tabella~\ref{tab:tab4-PSV}.
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{lll}
+\toprule
+\textbf{Variabile} & \textbf{Tipo} & \textbf{Valore} \\
+\midrule
+\texttt{Grid\_Xpx} & matrice $23 \times 30$ & Coordinate $X$ dei centri della griglia [in px] \\
+\texttt{Grid\_Ypx} & matrice $23 \times 30$ & Coordinate $Y$ dei centri della griglia [in px] \\
+\texttt{SXpx} & matrice $23 \times 30 \times 1499$ & Spostamento $X$ [in px] per ogni passo temporale \\
+\texttt{SYpx} & matrice $23 \times 30 \times 1499$ & Spostamento $Y$ [in px] per ogni passo temporale \\
+\bottomrule
+\end{tabular}
+\caption{Dati PSV.}
+\label{tab:tab4-PSV}
+\end{table}
+
+Un'istantanea statica dell'inquadratura PSV con un righello vicino al cilindro è stata scattata prima dell'esecuzione dell'esperimento, ed è fornita come file immagine \texttt{ref\_image.png}. Una piccola anteprima del file immagine è riportata in Figura~\ref{fig:test4refimg}. Lo scopo di questo passaggio preliminare è duplice. Da un lato, è stato utilizzato per stimare la risoluzione dell'immagine come $\text{res} = 3040~\text{px/m}$, che è qui già fornita come input per semplicità. Dall'altro lato, serve per trasformare le matrici \emph{pixel-based} \texttt{Grid\_Xpx}, \texttt{Grid\_Ypx}, \texttt{SXpx} e \texttt{SYpx} nelle corrispondenti matrici dimensionali nel nuovo sistema di coordinate ($x_0, y_0$), centrato nel punto di ristagno posteriore e orientato come mostrato in Figura~\ref{fig:test4sketchPSV}.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width = 0.5\textwidth]{test4img/ref_image}
+\caption{Anteprima dell'immagine di riferimento.}
+\label{fig:test4refimg}
+\end{figure}
+
+\section*{Analisi preliminare}
+
+\subsection*{Quesito 1}
+
+Calcolare la velocità media del canale (bulk velocity) $U_b$ basandosi sulle quantità misurate a monte del cilindro $Q$, $B$, $h$. Assumere che questa velocità sia quella della corrente libera che approccia il cilindro, $U_{\infty}$, e poi calcolare il numero di Reynolds $Re_D = D \cdot U_{\infty} / \nu$. Notare che $U_b \neq U_{\infty}$ poiché gli esperimenti coinvolgono un flusso d'acqua in un canale di dimensioni finite. Ciononostante, questa potrebbe essere una ragionevole prima approssimazione.
+
+\NotionDivider
+
+La velocità media del flusso nel canale è calcolata come:
+\[
+U_b = \frac{Q}{B \cdot h} = \frac{35\cdot 10^{-3}}{0.5\cdot 0.42}  = 0.1667 ~ \text{m/s}\,.
+\]
+
+Il numero di Reynolds è:
+\[
+\text{Re}_D = \frac{D \cdot U_b \cdot \rho}{\mu} = \frac{0.06 \cdot 0.167 \cdot 998}{0.001} = 9980\,.
+\]
+
+Poiché il numero di Reynolds  rientra nell'intervallo $5 \cdot 10^3 < \text{Re}_D < 3 \cdot 10^5$, il regime del flusso può essere classificato come subcritico.
+
+\subsection*{Quesito 2}
+
+Trasformare le matrici \emph{pixel-based} \texttt{Grid\_Xpx}, \texttt{Grid\_Ypx}, \texttt{SXpx} e \texttt{SYpx} in appropriate matrici adimensionali. Si fa ora riferimento al sistema di coordinate ($x_0, y_0$), che è più fisico rispetto a quello del frame PSV ($X, Y$). A tal fine, seguire i seguenti passaggi:
+
+\begin{enumerate}
+\item Trovare le coordinate dell'origine del nuovo sistema di coordinate ($x_0, y_0$), sia in pixel che in metri applicando la risoluzione suggerita $\text{res} = 3040 \text{ px/m}$.
+
+\item Partire da \texttt{Grid\_Xpx} e \texttt{Grid\_Ypx} e costruire due nuove matrici \texttt{Grid\_x0m}, \texttt{Grid\_y0m}, che contengono il centro delle celle espresso in metri secondo il nuovo sistema di coordinate ($x_0, y_0$). Questo richiede la conversione delle vecchie matrici \emph{pixel-based} in matrici dimensionali (in metri), e poi l'applicazione della trasformazione del sistema di coordinate per passare da ($X, Y$) a ($x_0, y_0$) --- non necessariamente in questo ordine. Infine, costruire le matrici adimensionali \texttt{Grid\_x0\_D} e \texttt{Grid\_y0\_D} ottenute normalizzando le coordinate dei punti della griglia con il diametro del cilindro, $D$.
+
+\item Partire da \texttt{SXpx} e \texttt{SYpx} e costruire nuove matrici \texttt{Sx0m} e \texttt{Sy0m}, contenenti gli spostamenti in metri secondo il nuovo sistema di coordinate ($x_0, y_0$). Ottenere le matrici del campo di velocità \emph{instantaneo} $u_0$, $v_0$ considerando che gli spostamenti sono stati misurati durante il tempo di esposizione $1/f_s$. Infine, rendere le due matrici adimensionali dividendole per la velocità media $U_b$; chiamiamo le matrici finali \texttt{u0\_Ub}, \texttt{v0\_Ub}.
+\end{enumerate}
+
+\NotionDivider
+
+Il punto \((x_0, y_0)\) nella griglia corrisponde al pixel (465, 285), come è evidenziato in Figura~\ref{fig:test4refpxl}. Convertendo queste coordinate in metri, si ottiene:
+\[
+x_0 = \frac{465}{3040} = 0.1530 ~ \text{m}\,, \quad y_0 = \frac{285}{3040} = 0.0938 ~ \text{m}\,.
+\]
+
+\begin{figure}[H]
+\centering
+\includegraphics[width = 0.5\textwidth]{test4img/ref_pxl}
+\caption{Immagine di riferimento con centro $(x_0, y_0)$ evidenziato.}
+\label{fig:test4refpxl}
+\end{figure}
+
+Per centrare il sistema di coordinate nel punto \((x_0, y_0)\), che rappresenta il punto di stagnazione posteriore del cilindro, le coordinate della griglia vengono trasformate come segue:
+\[
+\texttt{Grid\_x0m} = -\left( \frac{\texttt{Grid\_Xpx}}{3040} - 0.1530 \right), \quad
+\texttt{Grid\_y0m} = -\left( \frac{\texttt{Grid\_Ypx}}{3040} - 0.0938 \right).
+\]
+
+Le coordinate sono successivamente normalizzate rispetto al diametro del cilindro \(D\):
+\[
+\texttt{Grid\_x0\_D} = \frac{\texttt{Grid\_x0m}}{D}\,, \quad \texttt{Grid\_y0\_D} = \frac{\texttt{Grid\_y0m}}{D}\,.
+\]
+
+I vettori di spostamento inizialmente in pixel, vengono convertiti in metri:
+\[
+\texttt{Sx0m} = -\frac{\texttt{SXpx}}{3040}\,, \quad \texttt{Sy0m} = -\frac{\texttt{SYpx}}{3040}\,.
+\]
+
+\emph{Nota:} lo shift non va applicato anche qui, essendo che i vettori spostamento esprimono una differenza tra posizioni.
+
+Le velocità istantanee (\(u_0\) e \(v_0\)) vengono calcolate considerando il tempo di esposizione \(1/f_s\):
+\[
+u_0 = \texttt{Sx0m} \cdot f_s\,, \quad v_0 = \texttt{Sy0m} \cdot f_s\,.
+\]
+
+Infine, vengono normalizzate come segue:
+\begin{equation*}
+\texttt{u0\_Ub} = \frac{u_0}{U_b}\,,\quad  \texttt{v0\_Ub} = \frac{v_0}{U_b}\,.
+\end{equation*}
+
+
+
+
+\section*{Analisi del campo velocità media di Reynolds}
+
+\subsection*{Quesito 3}
+
+Calcolare il campo di velocità medio di Reynolds tramite le matrici \texttt{u0\_Ub} e \texttt{v0\_Ub}. Questo richiede di eseguire la media temporale delle matrici di velocità \emph{istantanee} precedentemente calcolate. Si raccomanda di utilizzare il comando MATLAB \texttt{nanmean}, in modo che le numerose celle \texttt{Nan} vengano ignorate. Infine, visualizzare il campo di velocità medio di Reynolds mostrando le seguenti quantità:
+
+\begin{enumerate}
+\item Il color plot del modulo della velocità media di Reynolds. A tal fine, si può utilizzare, ad esempio, il comando \texttt{pcolor} con \texttt{shading interp}.
+
+\item La mappa vettoriale tramite il comando MATLAB \texttt{quiver}. Si raccomanda di disegnare anche il cilindro tramite il comando MATLAB \texttt{rectangle}. Notare che si troveranno vettori spuri anche all'interno dello spazio occupato dal cilindro. Chiaramente, questi vettori sono non fisici e sono la conseguenza di errori di prospettiva o problemi nell'algoritmo PSV. Devono essere ignorati.
+
+\item Le streamlines con frecce tramite il comando MATLAB \texttt{streamslice}. Ancora una volta, si raccomanda di disegnare anche il cilindro tramite il comando MATLAB \texttt{rectangle}.
+
+\item I profili di $U_0/U_b$ lungo la linea orizzontale $Y_0/D=0$ e lungo le due linee verticali a $X_0/D=0.5$ e $X_0/D=1.5$. Questo potrebbe richiedere l'interpolazione dei valori della griglia in posizioni spaziali selezionate. Potreste usare il comando MATLAB \texttt{interp2}.
+\end{enumerate}
+
+\NotionDivider
+
+Le velocità medie di Reynolds adimensionali sono calcolate come:
+\[
+\frac{U_0}{U_b} = \texttt{nanmean}(\texttt{u0\_Ub})\,, \quad \frac{V_0}{U_b} = \texttt{nanmean}(\texttt{v0\_Ub})\,.
+\]
+
+\emph{Nota:} in realtà usiamo il comando \texttt{U0\_Ub=mean(u0\_Ub,3,'omitnan')}.
+
+A questo punto calcoliamo
+\begin{equation*}
+\texttt{Velocity\_Magntidue} = \sqrt{\left( \frac{U_0}{U_b} \right)^2 + \left( \frac{V_0}{U_b} \right)^2}
+\end{equation*}
+
+e osserviamo la Figura~\ref{fig:test431}.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width = 0.7\textwidth]{test4img/ravg1}
+\caption{Colorplot tramite \texttt{pcolor}.}
+\label{fig:test431}
+\end{figure}
+
+Nella scia del cilindro osserviamo una regione turbolenta. La distribuzione della magnitudine della velocità evidenzia una diminuzione significativa della velocità nella regione centrale della wake, rappresentata dalle tonalità di colore blu, che corrispondono a velocità più basse. Questo comportamento è tipico della zona di ricircolo dietro il cilindro, dove il flusso inverte localmente la sua direzione. Nelle aree più lontane dal cilindro, le tonalità di colore giallo e verde indicano un graduale recupero della velocità del flusso man mano che la turbolenza si dissipa. Il boundary layer è laminare nella regione iniziale, ma la wake diventa completamente turbolenta, coerente con il numero di Reynolds elevato.
+
+Ora si osservi la Figura~\ref{fig:test432}. La mappa vettoriale e le streamline evidenziano una simmetria quasi perfetta rispetto alla linea \(y_0/D = 0\), come atteso nel regime subcritico. 
+Il punto di separazione del boundary layer si verifica teoricamente in prossimità di un angolo di \textbf{82° nella parte frontale del cilindro}. Tuttavia, nella realtà, il punto di separazione può oscillare a causa della turbolenza nella wake. 
+La separazione del flusso avviene rapidamente in presenza di un \textbf{gradiente di pressione avversa}, infatti il minimo per la pressione si raggiunge ad 80°, ma il boundary layer laminare è talmente debole da far si che la separazione avvenga subito. Le streamline mostrano chiaramente la formazione di \textbf{due zone di ricircolo} opposte nella scia dietro il cilindro, con la wake caratterizzata da turbolenza altamente irregolare e oscillante.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width = 0.45\textwidth]{test4img/ravg2} \quad
+\includegraphics[width = 0.45\textwidth]{test4img/ravg3}
+\caption{Vector map tramite \texttt{quiver} (sinistra). Streamlines tramite \texttt{streamslice} (destra).}
+\label{fig:test432}
+\end{figure}
+
+Infine, si osservino i grafici di Figura~\ref{fig:test433}. Per quanto riguarda il profilo lungo l'asse orizzontale, si osserva un \textbf{cambiamento di direzione della velocità}, indicativo della transizione verso una wake completamente turbolenta. Le due zone di ricircolo influenzano significativamente il profilo della velocità. Invece, i profili verticali mostrano che, dopo il cilindro, la velocità cambia segno in corrispondenza di \(y_0/D = 0\), segnalando l'ingresso in una zona di turbolenza e ricircolazione. Man mano che ci si allontana dal cilindro (\(x_0/D = 1.5\)), la variazione della velocità è meno drastica, un segno che l'intensità delle turbolenze diminuisce.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width = 0.45\textwidth]{test4img/ravg4} \quad
+\includegraphics[width = 0.45\textwidth]{test4img/ravg5}
+\caption{Profilo orizzontale lungo $y_0/D=0$ (sinistra). Profili verticali lungo $x_0/D=0.5$ e $x_0/D=1.5$ (destra).}
+\label{fig:test433}
+\end{figure}
+
+\section*{Analisi dell'evoluzione dinamica del flusso}
+
+\subsection*{Quesito 4}
+
+Investigare l'evoluzione dinamica del flusso, come segue:
+
+\begin{enumerate}
+\item Plottare la storia temporale della velocità verticale normalizzata $v_0/U_b$ in un punto attorno alla parte posteriore del cilindro.
+
+\item Utilizzare la funzione MATLAB \texttt{fft\_of\_v0\_Ub\_velocity} fornita per calcolare la FFT (Fast Fourier Transform) del segnale di velocità $v_0/U_b$ e trovare lo spettro di frequenza. Identificare la frequenza di \emph{vortex shedding}, $f_{\text{shedding}}$, come il picco principale dello spettro di frequenza.
+
+\item Stimare il numero di Strouhal caratteristico della scia oscillante, come $\text{Sr} = f_{\text{shedding}} \cdot D / U_b$, e confrontarlo con il valore di riferimento della letteratura allo stesso numero di Reynolds per il caso non confinato (unbounded).
+\end{enumerate}
+
+\NotionDivider
+
+La serie temporale della componente normalizzata $v_0/U_b$ è stata analizzata nel punto $x_0/D \approx 1.5$, $y_0/D = 0$, quindi all'interno della scia, ed è mostrata a sinistra in Figura~\ref{fig:test4fuorier}. L'andamento temporale della velocità istantanea non è stazionario (in senso statistico) quindi si indagano le frequenze del segnale in cerca della frequenza dominante di \textbf{vortex shedding}. Nella figura di destra viene illustrato lo spettro di frequenza calcolato utilizzando la FFT. La frequenza dominante, indicata nel grafico, risultata pari a $f_{\text{shedding}} = 0.57$ Hz.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width = 0.45\textwidth]{test4img/fuorier1} \quad
+\includegraphics[width = 0.45\textwidth]{test4img/fuorier2}
+\caption{Storia temporale di $v_0/U_b$, zoom (sinistra). Spettro della frequenza (destra).}
+\label{fig:test4fuorier}
+\end{figure}
+
+Possiamo infine validare i nostri risultati, confrontandoli con quelli dell'articolo Fey et al. (1998) (\href{https://doi.org/10.1063/1.869675}{doi}).
+
+Utilizzando la relazione empirica per il regime subcritico, il numero di Strouhal teorico per il nostro caso può essere calcolato come:
+\[
+\text{Sr} = \frac{f_{\text{shedding}} \cdot D}{U_b}
+\approx 0.2042\,.
+\]
+
+I risultati di Fey et al. mostrano che
+\begin{equation*}
+\text{Sr}_{\text{Fey}} = \text{Sr}^* + \frac{m}{\sqrt{\text{Re}}}=0.1996\,,\text{ con }\text{Sr}^*=0.1776 \text{ e }m=2.2023\,.
+\end{equation*}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width = 0.7\textwidth]{test4img/fuorier3}
+\caption{Paragone tra risultati sperimentali.}
+\label{fig:test4fuorier2}
+\end{figure}
+
+Osserviamo Figura~\ref{fig:test4fuorier2}. I risultati differiscono del 2.32\%. Tale errore, considerabile comunque accettabile, è dovuto a queste principali differenze:
+\begin{itemize}
+    \item \textbf{Dominio}: Nel nostro esperimento il flusso avviene in una condotta d'acqua, mentre i dati sperimentali sono stati ottenuti in galleria del vento. La condotta introduce l'effetto dei bordi del dominio, che non è presente in un wind tunnel.
+    \item \textbf{Errori Numerici}: I calcoli numerici introducono una discreta incertezza nei risultati.
+\end{itemize}
+
+Confermiamo quindi la consistenza fisica dei nostri risultati.
+
+
+
+
+
+
+

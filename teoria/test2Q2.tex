@@ -1,0 +1,97 @@
+%!TEX root = ../main.tex
+
+\section{Quesito 2}
+
+Impostare la lunghezza del dominio, $L$, in modo tale che si possano raggiungere condizioni di \textbf{flusso completamente sviluppato} a partire dal profilo di velocità uniforme imposto all'ingresso. Si noti che l'obiettivo non è determinare con precisione la lunghezza necessaria per lo sviluppo del flusso (spesso chiamata \emph{entry length}), che è in linea di principio infinita. Invece, lo scopo è identificare una regione del dominio che, in pratica, possa essere considerata rappresentativa dello stato completamente sviluppato e possa quindi essere utilizzata per estrarre i risultati rilevanti della soluzione (profilo di velocità assiale, profilo degli sforzi di taglio, delle variabili turbolente e del gradiente idraulico).
+
+\vspace{0.3em}
+    
+\emph{\textbf{Nota:} la verifica dello stato di fluido completamente sviluppato richiede l'estrazione e il calcolo in MATLAB delle variabili elencate nella prossima sezione.}
+
+\vspace{0.3em}
+    
+\emph{\textbf{Nota:} da questo punto in poi, l'interesse è solo nella regione di fully developed flow}
+
+\vspace{0.3em}
+    
+\emph{\textbf{Suggerimento:} si applicano i suggerimenti del Test Case 1.}
+
+\begin{itemize}
+    \item \emph{Non sottovalutare l'impatto qualitativo! A volte un criterio qualitativo è più efficace di uno quantitativo troppo astratto.}
+    \item \emph{Cerca di guardare a variabili che abbiano un chiaro significato fisico e siano più direttamente comprensibili rispetto a metriche che, sebbene significative, potrebbero sembrare oscure. Ricorda che la comprensione intuitiva del flusso, corroborata dalla conoscenza della meccanica dei fluidi, è di massima importanza nella CFD applicata.}
+    \item \emph{Poiché lo stato completamente sviluppato viene raggiunto asintoticamente, qualunque sia la regione del tubo (o sezione del tubo) scelta, a rigor di logica, la soluzione CFD non corrisponderà al flusso completamente sviluppato in nessun caso. Quindi, la soluzione CFD sarà rappresentativa di un flusso completamente sviluppato al netto di una data variabilità (o, se preferisci, incertezza). L'obiettivo è avere questa variabilità entro limiti accettabili per lo scopo dello studio -- la sfida chiave è capire cosa significhi ``limiti accettabili''!}
+    \item \emph{In letteratura sono riportate molte formule per stimare la lunghezza d'ingresso del flusso turbolento in un tubo. Cerca di trovarne alcune e confrontale con i tuoi risultati CFD. Inoltre, se riesci a trovare molte formule che forniscono stime diverse, non limitarti a quelle che forniscono la corrispondenza migliore con i tuoi calcoli; chiediti invece ``perché queste formule forniscono stime diverse per gli stessi parametri? Perché alcune formule concordano con i miei risultati CFD e altre no?''}
+\end{itemize}
+
+\vspace{0.3em}
+    
+\emph{\textbf{Suggerimento:} cerca di capire in che misura la natura del fluido (laminare e turbolento) influenzi l'entry length; potrebbe essere utile esprimere l'entry length in forma adimenisonale, normalizzandola rispetto al diametro del tubo.}
+
+\NotionDivider
+
+La nostra prima simulazione usa $L=2$ m. Come si evince dalla Figura~\ref{fig:r2f1}, la velocità non si è ancora stabilizza, indicatore del fatto che il fluido non è ancora completamente sviluppato.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width = 0.7\textwidth]{r2f1}
+\caption{Velocità al centro della tubazione, $L=2$ m.}
+\label{fig:r2f1}
+\end{figure}%
+\FloatBarrier%
+
+Il nostro secondo tentativo prevede una lunghezza $L=10$ m. La mesh è composta da 200 elementi in direzione $z$ e 15 in direzione $r$; in particolare, gli elementi più vicini al muro ($\sim r=R$) hanno una lunghezza di 2.5 mm, mentre la restante porzione è divisa equamente in 14 parti (circa 3.4 mm).
+
+\begin{figure}[H]
+\centering
+\includegraphics[width = 0.7\textwidth]{r2f2}
+\caption{Velocità $W$ in diverse posizioni radiali, $L=10$ m.}
+\label{fig:r2f2}
+\end{figure}%
+\FloatBarrier%
+
+Analizzando qualitativamente il grafico della velocità assiale in funzione di $L/D$, Figura~\ref{fig:r2f2}, si osserva che questa grandezza raggiunge un valore costante dopo circa 45/50 diametri, circa a metà della lunghezza scelta. Ciò viene confermato anche dal grafico del gradiente della velocità, Figura~\ref{fig:r2f4}.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width = 0.7\textwidth]{r2f4}
+\caption{Gradiente di velocità \texttt{DWDZ} in diverse posizioni, $L=10$ m.}
+\label{fig:r2f4}
+\end{figure}%
+\FloatBarrier%
+
+La nostra intuizione trova conferma anche nel grafico della velocità in direzione radiale (Figura~\ref{fig:r2f3}): la differenza a 5, 6 o 7 metri è minima.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width = 0.7\textwidth]{r2f3}
+\caption{Velocità $W$ in diverse posizioni assiali, $L=10$ m.}
+\label{fig:r2f3}
+\end{figure}%
+\FloatBarrier%
+
+Sulla base di questa analisi qualitativa, è possibile supporre che il flusso possa essere considerato completamente sviluppato oltre una distanza $L_{\text{entry}}=50D=5$ m.
+
+Il risultato ottenuto può essere confrontato con formule \emph{semi-empiriche} riportate in letteratura. Per esempio, F. M. White nel libro \emph{Fluid Mechanics} suggerisce una stima per la lunghezza di ingresso come segue:
+\begin{equation}
+\label{eq:White}
+L_{\text{entry}} = 4.4 D \text{Re}^{1/6}\approx 2.9~\text{m}
+\end{equation}
+
+Guardando nuovamente il profilo della velocità in direzione radiale in Figura~\ref{fig:new3}, si può notare come a 3 m la velocità non sia del tutto ancora assestata nella prima metà del raggio, mentre lo è nella seconda metà. Ciò suggerisce che, sebbene la stima sia ottimistica, può essere ampiamente sufficiente se l'interesse dell'analisi è, per esempio, studiare il boundary layer.
+
+Stime più restrittive considerano
+\begin{equation}
+\label{eq:unknown}
+L_{\text{entry}} = 10 D \text{Re}^{1/6}\approx 6.4~\text{m}
+\end{equation}
+
+Esistono anche vie intermedie, ma in ogni caso esse risultano tutte comparabili a quella derivata dalla nostra analisi qualitativa.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width = 0.7\textwidth]{new3}
+\caption{Velocità $W$ in diverse posizioni assiali.}
+\label{fig:new3}
+\end{figure}%
+\FloatBarrier%
+

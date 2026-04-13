@@ -1,0 +1,155 @@
+%!TEX root = ../main.tex
+
+\section{Quesito 3}
+
+\subsection*{Estrazione dei parametri di output rilevanti e valutazione della consistenza fisica della soluzione}
+
+\vspace{0.5em}
+
+I parametri di output elencati di seguito devono essere estratti dalla soluzione PHOENICS tramite post-processing in MATLAB. Questi parametri sono di interesse all'interno dello stato di flusso completamente sviluppato; tuttavia, il loro calcolo è utile anche per valutare se il flusso è ragionevolmente sviluppato o meno. Pertanto, il suggerimento è di sviluppare delle routine MATLAB per il loro calcolo all'inizio del lavoro.
+
+I parametri sono:
+
+\begin{itemize}
+    \item La distribuzione della pressione $P^*$ lungo l'asse del tubo e il valore del coefficiente di attrito, $f$.
+    
+    \item Il profilo della velocità media di Reynolds lungo il raggio del tubo, che può essere espresso nelle seguenti due forme adimensionali:
+    \begin{itemize}
+        \item $W/W_b$ contro $r/R$, essendo $R$ il raggio del tubo.
+        \item $w^+$ contro $y^+$, dove $w^+=W/w_{\tau}$ e $y^+=yw_{\tau}/\nu$, essendo $w_{\tau}=\sqrt{\tau_{w}/\rho}$ la velocità di attrito e $y$ la distanza dalla parete del tubo ($y=R-r$).
+    \end{itemize}
+
+    \emph{Presentare questi risultati sotto forma di grafico log-log.}
+    
+    \item Il profilo degli sforzi di taglio totali $\tau(r)$ e delle sue componenti $\tau_{\text{visc}}(r)$ e $\tau_{\text{Re}}(r)$ lungo il raggio del tubo, riferendosi alle variabili adimensionali $\tau/\tau_{w}$ ($\tau_{\text{visc}}/\tau_{w}$ e $\tau_{\text{Re}}/\tau_{w}$) contro $r/R$.
+    
+    \vspace{0.3em}
+
+    \emph{\textbf{Nota:} I valori di $\tau_{\text{visc}}$ e $\tau_{\text{Re}}$ sono ottenuti numericamente dal modello costitutivo per il tensore degli sforzi e dall'ipotesi di Boussinesq per il tensore degli sforzi di Reynolds, ovvero:}
+    \begin{equation}
+    \label{eq:tauss}
+        \tau_{\text{visc}} = \mu \frac{dW}{dr}\,, \qquad  \tau_{\text{Re}} = \mu_{t}\frac{dW}{dr}\,.
+    \end{equation}
+    \emph{Al contrario, lo sforzo di taglio a parete non deve essere valutato dal profilo di velocità \texttt{W1} (perché?), ma facendo riferimento alla variabile di output PHOENICS \texttt{STRS}.}
+    
+    \item Il profilo dell'energia cinetica turbolenta, $k$, lungo il raggio del tubo, presentato in forma adimensionale come $k/W_{b}^{2}$ contro $r/R$.
+    
+    \item Il profilo del tasso di dissipazione turbolenta, $\varepsilon$, lungo il raggio del tubo, presentato in forma adimensionale come $\varepsilon R/{W_{b}}^{3}$ contro $r/R$.
+\end{itemize}
+
+L'output di PHOENICS e questi parametri calcolati in MATLAB devono essere ispezionati per valutare se la soluzione CFD è \textbf{fisicamente sensata} da un punto di vista qualitativo, ovvero, controllare se c'è ``qualcosa di strano / ovviamente errato'' nei risultati.
+
+\NotionDivider
+
+Come prima cosa, è bene specificare che in questa simulazione $y^+$ è compreso tra 45 e 46, in accordo con il \emph{wall function} approach.
+
+\begin{itemize}
+\item Per quanto riguarda $P^*$, cioè \texttt{P1}, si osservi la Figura~\ref{fig:r2f5}. In accordo con la teoria, la pressione diminuisce linearmente.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width = 0.7\textwidth]{r2f5}
+\caption{Pressione $P^*$ lungo l'asse $z$.}
+\label{fig:r2f5}
+\end{figure}%
+\FloatBarrier%
+
+La relazione teorica che lega $P^*$ e $\tau_w$ è
+\begin{equation}
+\label{eq:tau-P}
+\boxed{
+\tau_w=\frac{dP^*}{dz}\,\frac{D}{4} 
+}
+\end{equation}
+
+Nel nostro caso si esprime come
+\begin{equation}
+\label{eq:tau-P-star}
+\tau_w=\frac{P^*}{L}\,\frac{D}{4}  
+\end{equation}
+
+In PHOENICS possiamo sfruttare la variabile \texttt{STRS}$=\tau_w/\rho$ e dire che
+\begin{equation}
+\label{eq:tau-P-star-strs}
+\texttt{STRS}= \frac{\texttt{P1}}{L}\,\frac{D}{4}\,\frac{1}{\rho} 
+\end{equation}
+
+Usando come $L=2.5$ m, corrispondente agli ultimi 2.5 m di tubo (i.e. dalla cella 150 fino alla 200), dove il fluido è completamente sviluppato, otteniamo
+\begin{equation}
+\label{eq:tau-P-star-calcolo}
+\texttt{STRS}(\text{teorico})= \frac{134.4181}{2.5}\,\frac{0.1}{4}\,\frac{1}{998.23}=0.001347\text{ m}^2\text{s}^{-2}
+\end{equation}
+
+Invece, ispezionando la variabile \texttt{STRS} su MATLAB alla cella 150 otteniamo che \texttt{STRS}(pratico)$=0.001343\ {\text{m}^2}{\text{s}^{-2}}$ , il che verifica la consistenza (interna) della soluzione numerica.
+
+Infine, si può calcolare il coefficiente di attrito $f$ come
+\begin{equation}
+\label{eq:friction-f}
+\boxed{
+f=\frac{4 \tau_w}{\frac{1}{2}\rho W_b^2} 
+}=8\frac{ \texttt{STRS}}{ W_b^2} = 0.019106
+\end{equation}
+
+\textbf{Nota:} tale relazione deriva dalla formula di Darcy-Weisbach:
+\begin{equation}
+\label{eq:Darcy}
+\boxed{\frac{\Delta P^*}{L} = f \, \frac{1}{D} \, \frac{1}{2}\rho W_b^2} \quad \Longrightarrow \quad f=\frac{\Delta P^*}{L}\,\frac{D}{\frac{1}{2}\rho W_b^2}=\frac{4 \tau_w}{\frac{1}{2}\rho W_b^2} \text{ dall'Equazione}~\eqref{eq:tau-P-star}
+\end{equation}
+
+\textbf{Nota:} invece che confrontare \texttt{STRS} pratico e teorico si sarebbe potuto confrontare $f$ pratico e teorico.
+
+\item Per quanto riguarda i due contributi della velocità media di Reynolds si osservino le Figure~\ref{fig:r2f67}. Nella figura di sinistra, possiamo notare che lungo l'asse $z$ ad una lunghezza di 7.5 m dall'inlet, la velocità è \emph{praticamente} costante; tutta la variazione di velocità è confinata nella zona vicino alla parete. Questa è una caratteristica del moto turbolento, che si differenzia da quello laminare per un grafico appunto più \emph{piatto} o, in gergo, \emph{full}. Nella figura di destra osserviamo che $y^+$ parte da oltre la soglia di 30, e nella regione vicino alla parete ($\sim y^+<300$) la \emph{log law} è rispettata essendo il grafo una linea in scala logaritmica.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width = 0.45\textwidth]{r2f6}
+\quad
+\includegraphics[width = 0.45\textwidth]{r2f7}
+\caption{Contributi della velocità media di Reynolds, scala logaritmica in ascissa.}
+\label{fig:r2f67}
+\end{figure}%
+\FloatBarrier%
+
+\item Lo sforzo di taglio e le sue componenti sono mostrati in Figura~\ref{fig:r2f8}. 
+
+Come prima cosa, notiamo che la componente viscosa è prossima allo zero. Questo non ci sorprende, perché dal punto di vista fisico lo stress viscoso è importante solo nel sottostrato viscoso ($y^+<5$). Usando in questo caso le \emph{wall functions} con una $y^+>30$ non riusciamo a catturarne il vero comportamento.
+
+A causa di ciò, lo sforzo totale coincide con gli sforzi di Reynolds. Quest'ultimo, al centro della tubazione cresce linearmente e vicino alla parete crolla a zero. Ciò è fisicamente corretto per gli sforzi di Reynolds poichè alla parete $\mu_t=0$, tuttavia non lo è per lo sforzo totale: esso dovrebbe corrispondere a $\tau_w$. Dovremmo avere un picco nello stress viscoso che \emph{compensa} il crollo degli sforzi di Reynolds. Come già detto, ciò non accade per via della griglia troppo grossolana.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width = 0.7\textwidth]{r2f8}
+\caption{Profili degli sforzi.}
+\label{fig:r2f8}
+\end{figure}%
+\FloatBarrier%
+
+\item Il profilo dell'energia cinetica turbolenta lungo il raggio della tubazione in Figura~\ref{fig:r2f9} mostra come l'energia associata ai movimenti turbolenti vari dal centro del flusso fino alla parete della tubazione. 
+
+Al centro, l'energia cinetica turbolenta è generalmente bassa poiché la produzione locale di turbolenza è trascurabile (il gradiente di velocità è nullo).
+
+Verso la parete, l'energia cinetica turbolenta tende ad aumentare, raggiungendo il massimo vicino alla parete (perché i gradienti di velocità aumentano). Tuttavia, alla parete $k$ dovrebbe essere nullo per via della non-slip condition. Ciò non accade, ma è un effetto atteso dell'utilizzo delle \emph{wall functions}, che \emph{saltano} il sottostrato viscoso dove la turbolenza si smorza.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width = 0.7\textwidth]{r2f9}
+\caption{Profilo dell'energia cinetica turbolenta.}
+\label{fig:r2f9}
+\end{figure}%
+\FloatBarrier%
+
+\item Il profilo del tasso di dissipazione turbolenta $\varepsilon$, Figura~\ref{fig:r2f10},  mostra come l'energia turbolenta venga dissipata lungo il raggio della tubazione. 
+
+Al centro del flusso, la dissipazione turbolenta $\varepsilon$ è bassa, poiché la turbolenza è più debole in questa regione. 
+
+Avvicinandosi alla parete, si osserva una crescita iperbolica di $\varepsilon$, ma i valori del tasso di dissipazione rimangono ancora molto bassi. Questo comportamento è ancora una volta dovuto alla scelta della griglia computazionale, impedendo così di cogliere correttamente la dinamica del substrato viscoso, che è determinante per la dissipazione dell'energia turbolenta vicino alla parete.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width = 0.7\textwidth]{r2f10}
+\caption{Profilo del tasso di dissipazione turbolenta.}
+\label{fig:r2f10}
+\end{figure}%
+\FloatBarrier%
+
+\end{itemize}

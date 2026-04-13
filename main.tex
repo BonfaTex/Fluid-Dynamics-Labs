@@ -1,0 +1,113 @@
+\documentclass[10pt,a4paper,twoside]{book}
+
+\input{Style/style}
+
+\input{Style/matlab}
+
+\usepackage[
+	left=3cm, % inner
+	right=3cm, % outer
+	top=2.5cm,
+	bottom=2.5cm,
+	%showframe,
+	]{geometry}
+
+\usepackage{pdfpages}
+\includepdfset{pages=-, offset=0mm 1cm,
+   pagecommand={\thispagestyle{empty}}}
+
+\DeclareMathOperator{\Res}{Res}
+\DeclareMathOperator{\Log}{Log}
+\DeclareMathOperator{\loc}{loc}
+
+%%%%%%%% PARTE ESERCIZI
+
+\usepackage{titlesec}
+\usepackage{titletoc}
+\usepackage{etoolbox}
+
+\newcommand{\Esercizio}[1]{\subsection{Esercizio~#1}}
+\newcommand{\Soluzione}{\subsection{Soluzione}}
+
+\newcommand{\Lezione}{\qquad\hspace*{\fill}\textit}
+\newcommand{\Laboratorio}{\qquad\hspace*{\fill}\textit}
+
+\newcommand{\ParteEsercizi}{\section{Esercizi}}
+\newcommand{\ParteSoluzioni}{\section{Soluzioni}}
+
+\setcounter{secnumdepth}{2} % mi assicuro che gli esercizi siano numerati
+\setcounter{tocdepth}{1} % solo 1 per non avere tutti gli esercizi nel contents
+
+\numberwithin{figure}{chapter}
+\numberwithin{equation}{chapter}
+
+\begin{document}
+
+\frontmatter
+
+\pagestyle{empty}
+
+% COPERTINA
+
+\hypertarget{mytitlepage}{} % set the hypertarget
+\bookmark[dest=mytitlepage,level=chapter]{Title Page} % add the bookmark
+
+\vspace*{\fill}
+
+\begin{center}
+
+	\fg{0.5}{images/logo_polimi}
+
+	\vspace*{1.5cm}
+
+	{\Huge \textsc{Laboratori di CFD}}\\
+	
+	\vspace*{1.5cm}
+	
+	{\large per il corso di Fluid Labs}\\
+	\vspace*{0.3cm}
+	{\large A.A. 2025/2026}\\
+
+	\vspace*{5cm}
+
+	{\large A cura di}\\
+	\vspace*{0.3cm}
+	{\large Matteo Bonfadini, Manuel Alfano}\\
+
+	\vspace*{1.5cm}
+
+	\fg{0.2}{images/logo_blackCL}
+\end{center}
+\vspace*{\fill}
+\clearpage
+
+% INDICE
+
+\cleardoublepage
+\pagestyle{toc}
+\hypertarget{mytoc}{} % set the hypertarget
+\bookmark[dest=mytoc,level=chapter]{\contentsname} % add the bookmark
+\tableofcontents
+\cleardoublepage
+
+% MAIN MATTER
+
+\pagestyle{empty}
+\mainmatter
+
+
+\input{teoria/cap1.tex} \cleardoublepage
+\input{teoria/test2Q1.tex} 
+\input{teoria/test2Q2.tex} 
+\input{teoria/test2Q3.tex} 
+\input{teoria/test2Q4.tex} 
+\input{teoria/test2Q5.tex} 
+\input{teoria/test2Q6.tex} 
+\input{teoria/test2Q7.tex} \cleardoublepage
+\input{teoria/test3.tex} \cleardoublepage
+\input{teoria/test4.tex} \cleardoublepage
+\input{teoria/test5.tex} \cleardoublepage
+
+
+
+\end{document}

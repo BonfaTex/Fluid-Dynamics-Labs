@@ -1,0 +1,319 @@
+%!TEX root = ../main.tex
+
+\section{Quesito 6}
+
+\subsection*{Analisi dell'influenza del modello di turbolenza}
+
+\vspace{0.5em}
+
+I risultati CFD potrebbero essere sensibili alla scelta del modello di turbolenza. Lo scopo di questa parte dello studio è capire quali parametri di output sono maggiormente influenzati e in che misura. Tale ``incertezza di modellazione'' deve essere presa in considerazione quando si confrontano i risultati CFD con i dati sperimentali o quando si producono stime CFD in assenza di dati sperimentali per la calibrazione.
+
+\begin{enumerate}
+    \item Inizialmente, il test verrà effettuato considerando altre due varianti popolari del modello di turbolenza $k$-$\varepsilon$ standard, tutte operanti all'interno dell'approccio \emph{wall function} (richiedendo quindi che $y^+$ dei primi nodi della griglia sia maggiore di 30 e inferiore a circa 130).
+    Questi modelli sono:
+    \begin{itemize}
+        \item Il modello di turbolenza RNG $k$-$\varepsilon$ di Yakhot e Orszag (1986).
+        \item Il modello di turbolenza Realisable $k$-$\varepsilon$ di Shih et al. (1995).
+    \end{itemize}
+
+    \item In alternativa all'approccio wall function, quello \textbf{low-Reynolds} si basa sulla risoluzione del campo di moto vicino alla parete fino al sottostrato viscoso. Ciò richiede, da un lato, la definizione di mesh molto fini vicino alla parete, in modo che le celle near-wall siano caratterizzate da $y^+ \approx 1$ e, dall'altro, la modifica delle equazioni del modello di turbolenza vicino alla parete mediante funzioni di smorzamento.
+    
+    Risolvere lo stesso caso di studio utilizzando un modello di turbolenza low-Reynolds, nello specifico il modello Two-Layer $k$-$\varepsilon$ di Rodi (1991).
+    
+    Prestare attenzione alla definizione della mesh e fare le proprie considerazioni su punti di forza e debolezze dell'approccio \emph{low-Reynolds} rispetto a quello \emph{wall function}. Ripetere l'analisi e la validazione anche per questo nuovo modello di turbolenza e, in particolare, analizzare le informazioni che si possono raccogliere sul profilo dello sforzo di taglio e le sue componenti (viscoso e turbolento) utilizzando l'approccio \emph{low Reynolds}.
+\end{enumerate}
+
+\NotionDivider
+
+\begin{enumerate}
+\item $k$-$\varepsilon$ VS RNG $k$-$\varepsilon$ VS Realisable $k$-$\varepsilon$
+
+\begin{figure}[H]
+\centering
+\includegraphics[width = 0.6\textwidth]{r3f1}
+\caption{Confronto della pressione $P^*$ al centro della tubazione.}
+\label{fig:r3f1}
+\end{figure}%
+\FloatBarrier%
+
+\begin{figure}[H]
+\centering
+\includegraphics[width = 0.5\textwidth]{r3f7}
+\caption{Confronto di $W/W_b$ a $z=7.5$ m.}
+\label{fig:r3f7}
+\end{figure}%
+\FloatBarrier%
+
+\begin{figure}[H]
+\centering
+\includegraphics[width = 0.5\textwidth]{r3f9}
+\caption{Confronto di \texttt{DWDZ}.}
+\label{fig:r3f9}
+\end{figure}%
+\FloatBarrier%
+
+Notiamo che la condizione di FD è raggiunta dopo per Realisable $k$-$\varepsilon$.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width = 0.5\textwidth]{r3f8}
+\caption{Confronto di $w^+$ a $z=7.5$ m, ascissa in scala logaritmica.}
+\label{fig:r3f8}
+\end{figure}%
+\FloatBarrier%
+
+Qui possiamo notare che al centro del tubo (per $y^+$ alti) i modelli RNG e Realisable riescono a moellizzare una velocità più alta perché il mescolamento turbolento ($C_\mu$) non è costante ma dipende dalla deformazione del fluido (strain rate).
+
+\newpage
+
+\begin{figure}[H]
+\centering
+\includegraphics[width = 0.6\textwidth]{r3f4}
+\caption{Confronto di $\tau_{\text{visc}}/\tau_w$ a $z=7.5$ m.}
+\label{fig:r3f4}
+\end{figure}%
+\FloatBarrier%
+
+\begin{figure}[H]
+\centering
+\includegraphics[width = 0.6\textwidth]{r3f5}
+\caption{Confronto di $\tau_{\text{Re}}/\tau_w$ a $z=7.5$ m.}
+\label{fig:r3f5}
+\end{figure}%
+\FloatBarrier%
+
+\begin{figure}[H]
+\centering
+\includegraphics[width = 0.6\textwidth]{r3f6}
+\caption{Confronto di $f$.}
+\label{fig:r3f6}
+\end{figure}%
+\FloatBarrier%
+
+\begin{figure}[H]
+\centering
+\includegraphics[width = 0.6\textwidth]{r3f2}
+\caption{Confronto di $k/W_b^2$ a $z=7.5$ m.}
+\label{fig:r3f2}
+\end{figure}%
+\FloatBarrier%
+
+Per lo stesso motivo di prima, abbiamo una discrepanza nei grafici dell'energia cinetica: avendo $C_\mu$ variabile, il modello Realisable limita l'eccessiva produzione di energia turbolenta al centro.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width = 0.6\textwidth]{r3f3}
+\caption{Confronto di $\varepsilon R/W_b^3$ a $z=7.5$ m.}
+\label{fig:r3f3}
+\end{figure}%
+\FloatBarrier%
+
+\newpage
+
+\item Low-Reynolds approach con grid indipendence study
+
+Using the \emph{Null objects} feature, we created three consecutive meshes as follow:
+\begin{enumerate}
+    \item Mesh 1: $40 \times 200$, $y^+=0.4254$
+
+    \begin{figure}[H]
+    \centering
+    \includegraphics[width = 0.7\textwidth]{rl3}\\
+    \includegraphics[width = 0.3\textwidth]{rlr3}
+    \label{fig:rl3}
+    \end{figure}
+
+    \item Mesh 2: $50 \times 400$, $y^+=0.271$
+
+    \begin{figure}[H]
+    \centering
+    \includegraphics[width = 0.7\textwidth]{rl32}
+    \\
+    \includegraphics[width = 0.3\textwidth]{rlr32}
+    \label{fig:rl32}
+    \end{figure}
+
+    \item Mesh 3: $60 \times 600$, $y^+=0.231$
+
+    \begin{figure}[H]
+    \centering
+    \includegraphics[width = 0.7\textwidth]{rl33} \\
+    \includegraphics[width = 0.4\textwidth]{rlr33}
+    \label{fig:rl33}
+    \end{figure}
+\end{enumerate}
+
+Per quanto riguarda la convergenza nel caso del modello Low-Reynolds, è importante interpretare correttamente il comportamento dei residui. In particolare, il valore della dissipazione turbolenta \( \varepsilon \) lungo la condotta presenta un \textbf{andamento eterogeneo}. Nella regione completamente sviluppata, \( \varepsilon \) tende a zero all'asse, mostra un picco vicino alle pareti (a causa del viscous sublayer) e risulta molto basso al centro del tubo. Questo comportamento è tipico per un flusso in condotta.
+
+Quando \( \varepsilon \) viene normalizzato rispetto al valore all'ingresso, il trend apparente può risultare amplificato, poiché il valore all'ingresso è molto piccolo, essendo determinato da condizioni iniziali imposte automaticamente dal software o definite dall'utente. Di conseguenza, il \textbf{rapporto di normalizzazione} potrebbe portare a oscillazioni o picchi nei residui, apparentemente significativi ma non necessariamente problematici.
+
+Quindi, se le soluzioni risultano identiche (entro una tolleranza accettabile), è possibile concludere che la soluzione è convergente e valida, anche se i residui mostrano un comportamento oscillatorio.
+
+Questo comportamento dei residui può essere attribuito alla complessità del modello Low-Re rispetto al Wall Function. Nel caso Low-Re, il sistema numerico è più complesso, con celle più piccole vicino al muro e un modello matematico più dettagliato. Di contro, il modello Wall Function, essendo più semplice e con una griglia più grossolana, tende a mostrare residui più stabili, pur sacrificando parte della descrizione fisica del flusso.
+
+Infine, è importante sottolineare che in geometrie complesse e casi reali è normale osservare residui non perfettamente lisci. Quando si raggiunge un \textbf{plateau nel comportamento dei residui}, è spesso sufficiente accettare la soluzione e considerare che il sistema ha raggiunto la convergenza numerica.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width = 0.5\textwidth]{rgf3}
+\caption{Confronto della pressione $P^*$ al centro della tubazione.}
+\label{fig:rgf3}
+\end{figure}%
+\FloatBarrier%
+
+\begin{figure}[H]
+\centering
+\includegraphics[width = 0.5\textwidth]{rgf2}
+\caption{Confronto di $W/W_b$, ascissa in scala logaritmica.}
+\label{fig:rgf2}
+\end{figure}%
+\FloatBarrier%
+
+\begin{figure}[H]
+\centering
+\includegraphics[width = 0.5\textwidth]{rgf8}
+\caption{Confronto di \texttt{DWDZ}.}
+\label{fig:rgf8}
+\end{figure}%
+\FloatBarrier%
+
+\begin{figure}[H]
+\centering
+\includegraphics[width = 0.6\textwidth]{rgf5}
+\caption{Confronto di $w^+$, ascissa in scala logaritmica.}
+\label{fig:rgf5}
+\end{figure}%
+\FloatBarrier%
+
+\begin{figure}[H]
+\centering
+\includegraphics[width = 0.6\textwidth]{rgf6}
+\caption{Confronto di $w^+$, zoom.}
+\label{fig:rgf6}
+\end{figure}%
+\FloatBarrier%
+
+\begin{figure}[H]
+\centering
+\includegraphics[width = 0.5\textwidth]{rgf7}
+\caption{Confronto di $\tau_{\text{visc}}/\tau_w$, $\tau_{\text{Re}}/\tau_w$ e $\tau/\tau_w$.}
+\label{fig:rgf7}
+\end{figure}%
+\FloatBarrier%
+
+Gli sforzi viscosi rimangono a zero al centro, ma si alzano vicino alla parete catturando il comportamento del viscous sublayer. Gli sforzi di Reynolds, associati alle fluttuazioni turbolente, si azzerano al muro, dove il flusso è laminare. Di conseguenza, lo sforzo totale riflette questa combinazione.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width = 0.5\textwidth]{rgf4}
+\caption{Confronto di $f$.}
+\label{fig:rgf4}
+\end{figure}%
+\FloatBarrier%
+
+Anche qui, $f$ diminuisce all'aumentare del numero di elementi.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width = 0.5\textwidth]{rgf9}
+\caption{Confronto di $k/W_b^2$.}
+\label{fig:rgf9}
+\end{figure}%
+\FloatBarrier%
+
+L'energia cinetica turbolenta cresce fino alla zona fuori dal viscous sublayer(per via degli alti gradienti della Reynolds avaraged velocity responsabili della produzione di essa), dove la turbolenza è maggiore, poi va per azzerarsi entrando nella regione laminare vicino al muro.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width = 0.5\textwidth]{rgf10}
+\caption{Confronto di $\varepsilon R/W_b^3$.}
+\label{fig:rgf10}
+\end{figure}%
+\FloatBarrier%
+
+La dissipazione dell'energia cinetica turbolenta cresce vicino al viscous sublayer, dove l'energia viene distrutta, per poi azzerarsi in prossimità del muro, dove il flusso è laminare.
+
+\newpage
+
+\item Confronto delle Mesh 1 tra Wall functions approach e Low-Reynolds approach
+
+\begin{figure}[H]
+\centering
+\includegraphics[width = 0.5\textwidth]{rcf4}
+\caption{Confronto della pressione $P^*$ al centro della tubazione.}
+\label{fig:rcf4}
+\end{figure}%
+\FloatBarrier%
+
+\begin{figure}[H]
+\centering
+\includegraphics[width = 0.5\textwidth]{rcf1}
+\caption{Confronto di $W$ al centro della tubazione.}
+\label{fig:rcf1}
+\end{figure}%
+\FloatBarrier%
+
+\begin{figure}[H]
+\centering
+\includegraphics[width = 0.5\textwidth]{rcf2}
+\caption{Confronto di \texttt{DWDZ}.}
+\label{fig:rcf2}
+\end{figure}%
+\FloatBarrier%
+
+\begin{figure}[H]
+\centering
+\includegraphics[width = 0.5\textwidth]{rcf3}
+\caption{Confronto di $W/W_b$.}
+\label{fig:rcf3}
+\end{figure}%
+\FloatBarrier%
+
+Nel caso Low-Re, il modello cattura meglio il comportamento al muro. Il profilo di velocità risulta più a \emph{panettone} rispetto al Wall Function, poiché vengono considerati i gradienti più ripidi vicino alla parete.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width = 0.5\textwidth]{rcf6}
+\caption{Confronto di $w^+$, ascissa in scala logaritmica.}
+\label{fig:rcf6}
+\end{figure}%
+\FloatBarrier%
+
+\begin{figure}[H]
+\centering
+\includegraphics[width = 0.5\textwidth]{rcf7}
+\caption{Confronto di $\tau_{\text{visc}}/\tau_w$, $\tau_{\text{Re}}/\tau_w$ e $\tau/\tau_w$.}
+\label{fig:rcf7}
+\end{figure}%
+\FloatBarrier%
+
+\begin{figure}[H]
+\centering
+\includegraphics[width = 0.5\textwidth]{rcf5}
+\caption{Confronto di $f$.}
+\label{fig:rcf5}
+\end{figure}%
+\FloatBarrier%
+
+\begin{figure}[H]
+\centering
+\includegraphics[width = 0.5\textwidth]{rcf8}
+\caption{Confronto di $k/W_b^2$.}
+\label{fig:rcf8}
+\end{figure}%
+\FloatBarrier%
+
+\begin{figure}[H]
+\centering
+\includegraphics[width = 0.5\textwidth]{rcf9}
+\caption{Confronto di $\varepsilon R/W_b^3$.}
+\label{fig:rcf9}
+\end{figure}%
+\FloatBarrier%
+
+\end{enumerate}
+
+Possiamo concludere che il Low-Reynolds approach è più accurato, tuttavia bisogna anche considerare i costi computazioni. Se l'obiettivo dell'analisi è valutare gli sforzi ha senso investire, se invece è solo la velocità allora (forse) ha più senso il Wall function approach.
+
+
+

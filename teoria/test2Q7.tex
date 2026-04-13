@@ -1,0 +1,21 @@
+%!TEX root = ../main.tex
+
+\section{Quesito 7}
+
+\subsection*{Una domanda con importanti implicazioni pratiche (opzionale)}
+
+\vspace{0.5em}
+
+L'approccio \emph{wall function} impiegato in questo caso di studio richiede che le celle vicine alla parete siano caratterizzate da un $y^+$ superiore a 30 e inferiore a 130. Cosa succede se questa condizione non viene soddisfatta? Si noti che, in pratica, in una geometria complessa questa condizione non sarà soddisfatta per ogni cella.
+
+Eseguire le simulazioni numeriche con il modello di turbolenza $k$-$\varepsilon$ standard ignorando intenzionalmente questo vincolo, ovvero calcolare la soluzione CFD su mesh fini vicino alla parete nel range $y^+ = 1 \div 130$. Analizzare cosa accade quando $y^+$ è al di fuori del range ammissibile (cioè per $y^+$ inferiore a 30), facendo riferimento a tutte le variabili di output.
+
+\NotionDivider
+
+Applicare la legge logaritmica dove vige quella lineare genera turbolenza dove il flusso dovrebbe essere quasi laminare (sottostrato viscoso), con importanti conseguenze come:
+\begin{itemize}
+    \item senza smorzamento (dumping functions), il codice calcolerà una produzione di turbolenza enorme e irreale attaccata al muro;
+    \item friction factor sbagliato;
+    \item profili di velocità distorti vicino alla parete;
+    \item Convergenza fifficile perché le equazioni sono instabili.
+\end{itemize}

@@ -1,0 +1,355 @@
+%!TEX root = ../main.tex
+
+\chapter{Analysis of the hydrodynamic forces acting on a cylinder in steady free surface flow}
+\thispagestyle{empty}
+
+\section*{Descrizione e obiettivi del test case}
+
+L'obiettivo di questo caso di studio è investigare le forze di resistenza (\emph{drag}) e portanza (\emph{lift}) agenti su un cilindro sommerso in un flusso d'acqua stazionario a superficie libera. Gli esperimenti sono stati eseguiti nel canale d'acqua del Laboratorio di Idraulica, e le due componenti della forza (orizzontale e verticale) sono state misurate tramite una bilancia. Nel caso di studio proposto, il numero di Reynolds del cilindro $\text{Re}=D U_{\infty}/\nu$ rientra nell'intervallo del \emph{sub-critical regime}; pertanto, non sarà sorprendente notare che il flusso si separa a una certa distanza dal punto di ristagno anteriore, causando una zona di ricircolo dietro di esso, e che una scia oscillante viene creata dallo \emph{shedding} di due vortici controrotanti. Di conseguenza, anche la resistenza e la portanza mostreranno un comportamento oscillatorio.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width = \textwidth]{test5img/wrek}
+\caption{Sketch of the experiment.}
+\label{fig:test5sketch}
+\end{figure}
+
+Lo schema dell'esperimento è riportato in Figura~\ref{fig:test5sketch}. La bilancia è fissata al suolo e collegata al cilindro tramite le \emph{endplates}. Le \emph{endplates}, sagomate idrodinamicamente, permettono di sostenere il cilindro e assicurare una sorta di \emph{two-dimensional flow} attorno ad esso sopprimendo gli effetti tridimensionali alle estremità del cilindro. Due celle di carico sono installate all'interno della bilancia, e forniscono un voltaggio in uscita linearmente proporzionale alla forza applicata.
+
+La calibrazione della bilancia è stata eseguita dopo l'installazione delle \emph{endplates} e del cilindro sulla bilancia, applicando pesi campione al cilindro senza acqua nel canale come mostrato in Figura~\ref{fig:bello3}. Nello sviluppo della funzione di calibrazione, si è tenuto conto del fatto che le forze reali subite dalle celle non sono solo quelle prodotte dal carico applicato, ma includono anche il peso della struttura e altri piccoli contributi relativi alla deformabilità della struttura stessa. La funzione di calibrazione è stata determinata in modo tale che la condizione $F_x=0$, $F_y=0$ corrisponda all'assenza di forze (esterne) applicate, al netto del peso e dei piccoli contributi legati alla deformabilità.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width = 0.5 \textwidth]{test5img/bello3}
+\caption{Calibration setup.}
+\label{fig:bello3}
+\end{figure}
+
+Quando l'acqua scorre nel canale, assumendo che le forze dinamiche sulle \emph{endplates} siano trascurabili dato che sono sagomate idrodinamicamente, la forza esterna orizzontale $F_x$ è uguale alla forza di resistenza (\emph{drag}) agente sul cilindro, $F_D$.
+Viceversa, la forza esterna verticale $F_y$ è uguale alla somma della forza di portanza (\emph{lift}) agente sul cilindro $F_L$ e la forza di galleggiamento (\emph{buoyancy force}) agente sul cilindro e sulle \emph{endplates}, $F_B$.
+Quindi, mentre $F_D$ è semplicemente presa come l'output della calibrazione $F_x$, $F_L$ sarà data da:
+\begin{equation*}
+F_L = F_y - F_B
+\end{equation*}
+La forza di galleggiamento, $F_B$, potrebbe essere teoricamente calcolata moltiplicando il volume delle parti immerse (cilindro e parte delle \emph{endplates}) per il peso specifico dell'acqua. Tuttavia, poiché conoscere tutti i dettagli geometrici con alta accuratezza non è banale, misurare direttamente $F_B$ con la bilancia appare un'opzione preferibile. Questo si ottiene effettuando un test in acqua ferma (\emph{still water}) con lo stesso livello del test con acqua in movimento. Poiché nessuna forza di resistenza e portanza gioca un ruolo nel test statico, in questo caso la forza esterna orizzontale $F_x$ sarà zero e la forza esterna verticale $F_y$ sarà uguale a $F_B$.
+
+\newpage
+
+\section*{Dati di Input}
+
+I dati di input del problema sono riassunti nella Tabella~\ref{tab:tab5-dati}.
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{clcc}
+        \toprule
+        \textbf{Symbol} & \textbf{Parameter} & \textbf{Value} & \textbf{Units}  \\
+        \midrule
+        $B$ & Width of the channel & 0.5 & m    \\
+        $D$ & Diameter of the cylinder & 0.06 & m \\
+        $L$ & Width of the cylinder & 0.185 & m \\
+        $t$ & Thickness of the endplates & 0.002 & m \\
+        $b$ & Length of the endplates & 0.180 & m \\
+        $h$ & Water level in the channel upstream of the cylinder & 0.45 & m \\
+        $h_b$ & Distance of the cylinder wall from the channel bottom & 0.18 & m \\
+        $f_s$ & Sampling frequency & 200 & Hz \\
+        $Q$ & Volumetric flow rate of water & 75 & l/s \\
+        $\rho$ & Density of water & 998 & kg/m$^3$  \\
+        $\mu$ & Dynamic viscosity of water & 0.001 & Pa$\cdot$s \\
+        \bottomrule
+    \end{tabular}
+    \caption{Dati dell'esperimento.}
+    \label{tab:tab5-dati}
+\end{table}
+
+Il set completo dei dati di acquisizione è fornito nei seguenti \emph{workspaces} MATLAB (Tabella~\ref{tab:tab5-work}). In ogni \emph{workspace}, i valori di $F_x$ e $F_y$ sono forniti sotto forma di vettori. Questi valori sono già stati convertiti dal voltaggio in uscita delle celle tramite le funzioni di calibrazione, come spiegato precedentemente.
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{ll}
+        \toprule
+        \textbf{Filename} & \textbf{Condition} \\
+        \midrule
+        \texttt{FORCEdata\_stillwater.mat} & Cylinder and endplates, still water in the channel \\
+        \texttt{FORCEdata\_flow.mat} & Cylinder and endplates, flowing water in the channel \\
+        \bottomrule
+    \end{tabular}
+    \caption{File dei dati sperimentali.}
+    \label{tab:tab5-work}
+\end{table}
+
+\section*{Quesito 1}
+
+Calcolare la velocità media del canale (\emph{bulk velocity}) $U_b$ basandosi sulle quantità misurate a monte del cilindro $Q$, $B$, $h$. Assumere che questa velocità sia quella della corrente libera che approccia il cilindro, $U_{\infty}$, e poi calcolare il numero di Reynolds $\text{Re}=D U_{\infty}/\nu$.
+
+\NotionDivider
+
+La velocità media del flusso nel canale è calcolata come:
+\[
+U_b =  \frac{Q}{B \cdot h}  \approx 0.333 ~ \text{m/s}\,.
+\]
+
+Il numero di Reynolds risulta quindi:
+\[
+\text{Re} = \frac{D \cdot U_\infty \cdot \rho}{\mu}  \approx \frac{D \cdot U_b \cdot \rho}{\mu}  \approx 19960\,.
+\]
+\noindent
+Il regime subcritico è confermato poiché \(5 \cdot 10^3 < \text{Re} < 3 \cdot 10^5\).
+
+\newpage
+
+\section*{Quesito 2}
+
+Calcolare la forza di galleggiamento (\emph{buoyancy force}) $F_B$ agente sulle parti immerse (cilindro e parte delle \emph{endplates}).
+
+\NotionDivider
+
+La forza di galleggiamento è determinata utilizzando il test in acqua ferma, denominato \texttt{FORCEdata\_stillwater.mat}. Come mostrato in Figura~\ref{fig:bello2}, abbiamo che:
+\[
+\boxed{
+F_y = F_B \qquad \left( F_x=0 \right)
+}
+\]
+
+Dai dati del test statico (facciamo la media temporale per filtrare il rumore):
+\[
+F_B = \frac{1}{12800} \sum_{i=1}^{12800} F_{y,i} = 7.3236 ~ \text{N}\,.
+\]
+
+\begin{figure}[H]
+\centering
+\includegraphics[width = 0.7 \textwidth]{test5img/bello2}
+\caption{Still water test.}
+\label{fig:bello2}
+\end{figure}
+
+\newpage
+
+\section*{Quesito 3}
+
+Calcolare le forze di resistenza (\emph{drag}) e portanza (\emph{lift}) medie di Reynolds agenti sul cilindro e mostrate in Figura~\ref{fig:drl}, $\langle F_D\rangle$ e $\langle F_L\rangle$, e i coefficienti di resistenza e portanza medi di Reynolds, $\langle C_D\rangle$ e $\langle C_L\rangle$. Notare che \textbf{le forze di resistenza e portanza agenti sulle \emph{endplates} sono considerate trascurabili}.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width = 0.3 \textwidth]{test5img/drl}
+\caption{Drag and Lift forces.}
+\label{fig:drl}
+\end{figure}
+
+\NotionDivider
+
+Ora consideriamo il test in acqua corrente \texttt{FORCEdata\_flow.mat}. Come mostrato in Figura~\ref{fig:bello1}, le forze di resistenza e portanza medie di Reynolds sono
+\begin{equation*}
+\boxed{
+    F_x \approx F_D \qquad F_y \approx F_B+F_L
+}  
+\end{equation*}
+
+In Matlab, le calcoliamo come:
+\begin{equation*}
+\begin{aligned}
+\langle F_D\rangle &= \frac{1}{62800} \sum_{i=1}^{62800} F_{x,i} = 0.9223 ~ \text{N}\,, \\
+\langle F_L\rangle &= \frac{1}{62800} \sum_{i=1}^{62800} F_{y,i}  -F_B=-0.0172 ~ \text{N} \,.
+\end{aligned}
+\end{equation*}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width = 0.9 \textwidth]{test5img/bello1}
+\caption{Flowing water test.}
+\label{fig:bello1}
+\end{figure}
+
+I coefficienti di resistenza e portanza medi di Reynolds sono:
+\[
+\langle C_D \rangle = \frac{\langle F_D \rangle}{\frac{1}{2} \rho U_b^2 A}\,, \qquad \langle C_L \rangle = \frac{\langle F_L \rangle}{\frac{1}{2} \rho U_b^2 A}\,,
+\]
+
+dove l'area frontale di riferimento è 
+\[
+A = D \cdot L = 0.06 \cdot 0.185 = 0.0111 ~ \text{m}^2\,.
+\]
+
+I risultati ottenuti sono:
+\[
+\langle C_D \rangle = 1.4987\,, \qquad \langle C_L \rangle = -0.0280\,.
+\]
+
+Coerentemete alle aspettative, poiché il cilindro è un corpo simmetrico e il flusso è mediamente simmetrico, $\langle F_L \rangle$ e $\langle C_L \rangle$ sono molto vicini a 0.
+
+\section*{Quesito 4}
+
+Calcolare le incertezze di $C_D$ e $C_L$ partendo dalla definizione di queste quantità e applicando la legge di propagazione degli errori:
+\begin{equation}\label{eq:test5q4}
+y=y(x_1,\dots,x_n)\quad\rightarrow\quad
+u(y) = \sqrt{\sum_{i=1}^{n} \left( \frac{\partial y}{\partial x_i} u(x_i) \right)^2}
+\end{equation}
+
+Fare riferimento ai valori di incertezza nella Tabella~\ref{tab:tab5-un} e provare a stimare i valori mancanti.
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{llcc}
+        \toprule
+        \textbf{Variable} & \textbf{Instrument} & \textbf{Uncertainty} & \textbf{Units} \\
+        \midrule
+        $B$ & Ruler & ??? & mm \\
+        $D$ & Vernier caliber with scale value 0.05 & ??? & mm \\
+        $L$ & Ruler & ??? & mm \\
+        $h$ & Piezometer & 1 & mm \\
+        $Q$ & \parbox[t]{5cm}{Proline Promag 50L installed \\ in a 200 mm pipe (DN200)} & ??? & of reading \\
+        $\rho$ & -- & $\approx 0$ &  \\
+        $F_x$ & From calibration of frame & 0.045 & N \\
+        $F_y$ & From calibration of frame & 0.025 & N \\
+        \bottomrule
+    \end{tabular}
+    \caption{Incertezze strumentali.}
+    \label{tab:tab5-un}
+\end{table}
+
+\emph{\textbf{Nota:} Si noti che queste formule potrebbero essere applicate a livello istantaneo, ovvero ottenendo l'incertezza per ogni singolo valore $C_D(t)$ e $C_L(t)$; in questo caso, le incertezze dei due coefficienti varieranno nel tempo. Tuttavia, appare più pratico calcolare direttamente le incertezze dei coefficienti mediati alla Reynolds, $\langle C_D\rangle$ e $\langle C_L\rangle$, partendo da $\langle F_D\rangle$ e $\langle F_L\rangle$. Le incertezze per $F_x$ e $F_y$ valgono ragionevolmente anche per i loro valori mediati alla Reynolds, $\langle F_x\rangle$ e $\langle F_y\rangle$.}
+
+\NotionDivider
+
+Per calcolare le incertezze di $\langle C_D\rangle$ e $\langle C_L\rangle$ dobbiamo esprimere tali quantità in funzione di parametri di cui sappiamo l'incertezza. Di conseguenza, abbiamo:
+\begin{equation*}
+\langle C_D \rangle = \frac{\langle F_D \rangle}{\frac{1}{2} \rho U_b^2 A} = \frac{2 \langle F_D \rangle B^2 h^2}{ \rho Q^2 DL}
+\end{equation*}
+
+Le derivate parziali di $\langle C_D \rangle$ rispetto alle variabili sono:
+\begin{align*}
+\frac{\partial \langle C_D \rangle}{\partial \langle F_D \rangle} &= \frac{2 B^2h^2}{\rho Q^2 A}\,, &\frac{\partial \langle C_D \rangle}{\partial Q} = -\frac{4 \langle F_D \rangle B^2h^2}{\rho Q^3 A}\,, \\
+\frac{\partial \langle C_D \rangle}{\partial B} &= \frac{4 \langle F_D \rangle B h^2}{\rho Q^2 A}\,, &\frac{\partial \langle C_D \rangle}{\partial D} = -\frac{2 \langle F_D \rangle B^2h^2}{\rho Q^2 D^2 L}\,, \\
+\frac{\partial \langle C_D \rangle}{\partial h} &= \frac{4 \langle F_D \rangle B^2 h}{\rho Q^2 A}\,, &\frac{\partial \langle C_D \rangle}{\partial L} = -\frac{2 \langle F_D \rangle B^2h^2}{\rho Q^2 D L^2}\,.
+\end{align*}
+
+\emph{Nota:} non calcoliamo la derivata rispetto $\rho$ perché l'incertezza di $\rho$ è praticamente nulla.
+
+Prima di applicare la formula di propagazione dell'incertezza, dobbiamo trovare le incertezze di tali variabili:
+\begin{itemize}
+\item $u(\langle F_D \rangle)=u(F_D)=u(F_x)=0.045~$N (Tabella~\ref{tab:tab5-un}).
+\item $u(B)=u(L)=\frac{1 ~ \text{mm}}{2} = 0.0005 ~ \text{m}$ (Ikea ruler).
+\item $u(D) = 50~\mu\text{m} = 0.00005 ~ \text{m}$ (pagina 1 del file \texttt{caliber-accuracy.pdf})
+\item $u(Q)=A_\text{pipe}\cdot u(U_\text{pipe})$, dove $u(U_\text{pipe})$ rappresenta l'incertezza sulla velocità media e, come specificato a pagina 10 del manuale \texttt{proline-promag-50L-datasheet.pdf}, si esprime come
+\begin{equation*}
+u(U_\text{pipe})= \frac{0.5}{100} \cdot \frac{Q}{A_\text{pipe}} + 0.001 = \frac{0.5}{100} \cdot \frac{Q}{\frac{\pi}{4} D_N^2} + 0.001 \approx 0.0129  ~ \text{m/s}  
+\end{equation*}
+
+Dunque, abbiamo che $u(Q)\approx 0.000406~\text{m}^3/\text{s}$.
+\end{itemize}
+
+A questo punto, possiamo applicare la formula di propagazione dell'errore~\eqref{eq:test5q4} e otteniamo
+\begin{equation*}
+u(\langle C_D \rangle)=0.0754 \qquad \Longrightarrow \qquad \langle C_D \rangle = 1.4987 \pm 0.0754\,.
+\end{equation*}
+
+Per quanto riguarda $u(\langle C_L \rangle)$ il calcolo è analogo, con l'accortezza che $u(\langle F_L \rangle)=u(F_L)=u(F_B-F_y)=\sqrt{2u^2(F_y)}$ poiché abbiamo usato la bilancia due volte. Otteniamo:
+\begin{equation*}
+u(\langle C_L \rangle)=0.0574 \qquad \Longrightarrow \qquad \langle C_L \rangle = -0.0280 \pm 0.0574\,.
+\end{equation*}
+
+Notiamo due cose:
+\begin{enumerate}
+    \item Il coefficiente di drag presenta un’incertezza maggiore, riflettendo la maggiore sensibilità di \( \langle C_D \rangle \) rispetto alla forza e alla portata \( Q \).
+    \item Il fatto che l'incertezza di $\langle C_L \rangle$ sia più grande del valore medio significa che il valore medio di $\langle C_L \rangle$ è statisticamente indistinguibile da zero. Questo conferma perfettamente la teoria per un cilindro simmetrico.
+\end{enumerate}
+
+\newpage
+
+\section*{Quesito 5}
+
+Usare la funzione MATLAB \texttt{fft\_of\_force} fornita per calcolare la FFT (Fast Fourier Transform) del segnale $F_L$ e trovare lo spettro di frequenza. Identificare la frequenza di \emph{vortex shedding}, $f_{\text{shedding}}$, come il picco principale dello spettro di frequenza, e calcolare il numero di Strouhal $\text{Sr} = f_{\text{shedding}} \cdot D / U_b$. Confrontarlo con il valore di riferimento della letteratura allo stesso numero di Reynolds per il caso \emph{unbounded}. Come soluzione di riferimento, può essere utilizzato il grafico fornito nell'articolo Fey et al. (1998) (\href{https://doi.org/10.1063/1.869675}{doi}), come riportato in Figura~\ref{fig:str}.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width = 0.6 \textwidth]{str}
+\caption{Numero di Strouhal dall'articolo Fey et al. (1998).}
+\label{fig:str}
+\end{figure}
+
+\NotionDivider
+
+Utilizzando la serie temporale di $F_L$ e la relativa frequenza di campionamento $f_s$, possiamo identificare la frequenza dominante di \emph{vortex shedding} come il picco dello spettro di frequenza calcolato con la FFT (Fast Fourier Transform). Quest'ultimo è mostrato in Figura~\ref{fig:freL}, mentre la frequenza di shedding è
+\begin{equation*}
+f_{\text{shedding}} = 1.008~\text{Hz}\,.   
+\end{equation*}
+
+È interessante notare che il calcolo di tale frequenza potrebbe essere \emph{pericoloso} se fatto sulla forza orizzontale. Questo perché ogni vortice che si stacca, sia sopra che sotto, contribuisce ad aumentare il drag. Inoltre, per via della turbolenza, ci potrebbe essere più rumore sperimentale.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width = 0.5 \textwidth]{test5img/freL}
+\caption{Spettro di frequenza di $F_L$.}
+\label{fig:freL}
+\end{figure}
+
+Ora calcoliamo il numero di Strouhal:
+\[
+\text{Sr} = \frac{f_{\text{shedding}} \cdot D}{U_b}
+\approx 0.1814\,.
+\]
+
+I risultati di Fey et al. mostrano che
+\begin{equation*}
+\text{Sr}_{\text{Fey}} = \text{Sr}^* + \frac{m}{\sqrt{\text{Re}}}=0.1932\,,\text{ con }\text{Sr}^*=0.1776 \text{ e }m=2.2023\,.
+\end{equation*}
+
+La differenza è dunque del 6\%. Tale errore, considerabile comunque accettabile, è dovuto a queste principali differenze:
+\begin{itemize}
+    \item \textbf{Dominio}: Nel nostro esperimento il flusso avviene in una condotta d'acqua, mentre i dati sperimentali sono stati ottenuti in galleria del vento. La condotta introduce l'effetto dei bordi del dominio, che non è presente in un wind tunnel.
+    \item \textbf{Errori Numerici}: I calcoli numerici introducono una discreta incertezza nei risultati.
+\end{itemize}
+
+Confermiamo quindi la consistenza fisica dei nostri risultati.
+
+\section*{Quesito 6}
+
+Impostare lo stesso livello dell'acqua nei test statici e dinamici è importante per la misurazione accurata della forza dinamica. Fornire una stima degli errori nei coefficienti di forza $\langle C_D\rangle$ e $\langle C_L\rangle$ dovuti a un diverso livello dell'acqua nei test statici e dinamici (assumere $\Delta h=2$ mm, per esempio). Considerare che l'area della sezione d'acqua di ciascuna delle due \emph{endplates}, come osservata dall'alto, è un rettangolo di dimensioni $180~\text{mm} \times 2~\text{mm}$ (vedere Figura~\ref{fig:test5sketch}).
+
+\NotionDivider
+
+L'effetto di una variazione di 2~mm nel livello dell'acqua (\(\Delta h = 2 ~ \text{mm}\)) tra i test è stato analizzato. La principale conseguenza di questa discrepanza è una modifica della forza di galleggiamento che agisce sul cilindro, influenzando i coefficienti \(\langle C_D\rangle\) e \(\langle C_L\rangle\).
+
+La procedura seguita è stata la seguente:
+\begin{itemize}
+    \item L'area della sezione d'acqua delle piastre è stata calcolata come \(A_{\text{endplate}} = 0.18 \cdot 0.002 ~ \text{m}^2\).
+
+    Di conseguenza, la differenza in volume è
+    \begin{equation*}
+    \Delta V = 2 \Delta h \cdot A_{\text{endplate}}
+    \end{equation*} 
+
+    \item La nuova forza di galleggiamento dovuta alla variazione del livello dell'acqua è stata calcolata come:
+    \[
+    F_B^{\text{new}} = F_B + \rho \cdot g \cdot \Delta V\,,
+    \]
+    dove \(F_B\) è la forza di galleggiamento originale, \(\rho = 998 ~ \text{kg/m}^3\) è la densità del fluido e \(g = 9.81 ~ \text{m/s}^2\) è l'accelerazione gravitazionale.
+
+    \item La velocità media aggiornata \(U_b^{\text{new}}\) è stata determinata utilizzando la geometria del canale e la portata:
+    \[
+    U_b^{\text{new}} = \frac{Q}{B \cdot (h + \Delta h)}\,.
+    \]
+
+    \item I coefficienti \(C_L\) e \(C_D\) sono stati calcolati come:
+    \[
+    \langle C_D^{\text{new}} \rangle = \frac{\langle F_D\rangle}{0.5 \cdot \rho \cdot (U_b^{\text{new}})^2 \cdot A}\,, \qquad
+    \langle C_L^{\text{new}}\rangle = \frac{\langle F_L^{\text{new}}\rangle}{0.5 \cdot \rho \cdot (U_b^{\text{new}})^2 \cdot A},
+    \]
+    dove \(A = D \cdot L\) rappresenta l'area proiettata del cilindro, \(\langle F_D \rangle\) e \(\langle F_L^{\text{new}} \rangle\) sono  rispettivamente la forza di resistenza media di Reynolds e la forza di sollevamento media di Reynolds aggiornata.
+
+    \item Gli errori relativi nei coefficienti sono stati calcolati come:
+    \[
+    \mathcal{E}_{C_D} = \frac{|\langle C_D\rangle - \langle C_D^{\text{new}}\rangle|}{\langle C_D\rangle} \cdot 100=0.89\%\,, \qquad
+    \mathcal{E}_{C_L} = \frac{|\langle C_L\rangle - \langle C_L^{\text{new}}\rangle|}{|\langle C_L\rangle|} \cdot 100=81.77\%\,.
+    \]
+\end{itemize}
+
+I risultati evidenziano che anche piccole variazioni nel livello dell'acqua possono influire significativamente sull'accuratezza del coefficiente di portanza \(C_L\). Questo effetto è dovuto alla dipendenza diretta della forza di portanza dalla correzione della galleggiabilità, che risulta sensibile alle variazioni nel livello dell'acqua. Tuttavia, è bene ricordare che il valore di $C_L$ è molto basso, di conseguenza anche piccole variazioni hanno un notevole impatto percentuale.
+
+
+ Al contrario, il coefficiente di resistenza \(C_D\), come si aspetterebbe, è meno influenzato.
+
+
+
+
+

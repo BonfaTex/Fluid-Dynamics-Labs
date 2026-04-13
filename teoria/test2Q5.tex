@@ -1,0 +1,191 @@
+%!TEX root = ../main.tex
+
+\section{Quesito 5}
+
+\subsection*{Validazione della soluzione CFD}
+
+\vspace{0.5em}
+
+Poiché non è disponibile una soluzione analitica per questo caso, i risultati CFD vengono confrontati con i dati sperimentali e alcune formule empiriche disponibili in letteratura. In particolare, i dati sperimentali provengono dalla tesi di dottorato di Lars Even Torbergsen (1998), che ha studiato il flusso pienamente sviluppato in un tubo per l'aria a numeri di Reynolds simili a quelli del caso di test attuale. Lo scopo del confronto con i dati di riferimento è duplice. Da un lato, può essere utilizzato per verificare che sia stata fatta la scelta appropriata delle impostazioni di modellazione (qui, il modello di turbolenza); in questo caso, viene usato il termine \emph{validazione}. Dall'altro, può essere utilizzato per decidere le impostazioni di modellazione più appropriate, ad esempio il miglior modello di turbolenza all'interno di un dato set di opzioni; in questo caso, viene usato il termine \emph{calibrazione}. In questa fase, si richiede di eseguire una validazione del setup CFD.
+
+\subsubsection*{Perdite per attrito}
+
+Innanzitutto, la validazione viene eseguita facendo riferimento alle perdite per attrito, che sono quantificate attraverso il coefficiente di attrito \(f\). Si noti che il coefficiente di attrito \(f\), il coefficiente di attrito superficiale \(C_f\), il gradiente idraulico \(J\), il gradiente di pressione \(-dP^*/dz\) e lo sforzo di taglio a parete \(\tau_w\) sono parametri intercambiabili legati alle perdite per attrito (\textbf{dimostralo!}). Pertanto, una validazione rispetto a \(f\) è praticamente equivalente a una validazione rispetto a, ad esempio, \(\tau_w\) o \(J\).
+
+Il fattore di attrito ottenuto dalla simulazione CFD, \(f_{\text{CFD}}\), deve essere confrontato con quanto segue:
+\begin{itemize}
+    \item il valore ottenuto sperimentalmente da Torbergsen (1998), pari a 0.0190.
+    \item il diagramma di Moody (stima grafica).
+    \item la formula di Prandtl per tubi idraulicamente lisci:
+    \[
+    \frac{1}{\sqrt{f}} = -2 \log_{10}\left(\frac{2.51}{\text{Re}_b \sqrt{f}}\right)\,,
+    \]
+    \item la formula di Haaland per tubi idraulicamente lisci:
+    \[
+    \frac{1}{\sqrt{f}} = -1.8 \log_{10}\left(\frac{6.9}{\text{Re}_b}\right)\,.
+    \]
+\end{itemize}
+
+\emph{\textbf{Nota:} La variabilità di queste stime potrebbe essere considerata come una sorta di incertezza intrinseca nella valutazione del fattore di attrito. Questo aspetto deve essere tenuto in considerazione quando si interpretano i risultati del processo di validazione.}
+
+\NotionDivider
+
+Il valore trovato nella terza mesh è di circa $f_{\text{CFD}}=0.01895$. Confrontiamolo con i riferimenti:
+\begin{itemize}
+    \item $f_{\text{Torbergsen}}=0.0190$
+    \item $f_{\text{Moody}}=0.0190$
+    \item $f_{\text{Prandtl}}=0.0191186$
+    \item $f_{\text{Haaland}}=0.0189$
+\end{itemize}
+
+I risultati ottenuti per il fattore di attrito dalla simulazione CFD sono in buona concordanza con i valori sperimentali e le formule empiriche presenti in letteratura. Tuttavia, è essenziale considerare l'incertezza derivante sia dalle fonti numeriche che da quelle legate alla modellizzazione. Tale incertezza deve essere analizzata e quantificata per valutare la robustezza e l'affidabilità dei risultati della simulazione:
+\begin{equation*}
+\begin{gathered}
+f=\bar{f}\pm\sigma/\sqrt{N}\,\qquad\text{dove:}\\
+\bar{f}=\frac{1}{N} \sum_{i=1}^{N} f_i =\frac{f_{\text{CFD}}+f_{\text{Torbergsen}}+f_{\text{Moody}}+f_{\text{Prandtl}}+f_{\text{Haaland}}}{5}= 0.0190\,, \\
+\sigma= \sqrt{\frac{1}{N-1} \sum_{i=1}^N \left(f_i - \bar{f}\right)^2}=8.12\cdot 10^{-5}\\
+\Longrightarrow f=0.0190\pm 4\cdot 10^{-5}
+\end{gathered}
+\end{equation*}
+
+che rientra nel nostri risultati.
+
+\subsubsection*{Profilo della velocità assiale media di Reynolds lungo il raggio del tubo}
+
+Successivamente, la validazione viene eseguita facendo riferimento al profilo della velocità assiale media di Reynolds. Per queste variabili, i termini di confronto sono i seguenti:
+\begin{itemize}
+    \item i dati ottenuti sperimentalmente da Torbergsen (1998), presentati in forma adimensionale \(W/W_b\) in funzione di \(r/R\). In particolare, vengono forniti due serie di dati, che corrispondono a due diverse operazioni di post-elaborazione sui dati sperimentali.
+
+    \item il profilo secondo la legge di potenza di Nikuradse:
+    \[
+    \frac{W}{W_0} = \left(1 - \frac{r}{R}\right)^{\frac{1}{n}}\,,
+    \]
+    dove \(W_0\) è la velocità assiale al centro del tubo e la potenza \(n\) è uguale al fattore di attrito elevato a \( -0,5\), cioè \(n = f^{-0.5}\). Per valutare \(n\), devono essere utilizzate le stime di \(f\) dalle formule precedenti (diagramma di Moody, formula di Prandtl, formula di Haaland). Quindi, il paragone verrà fatto attraverso tre diverse curve presenti in letteratura.
+
+    \emph{\textbf{Nota:}}
+    \begin{equation*}
+    \frac{W}{W_b}=\frac{(2n+1)(n+1)}{2n^2} \left( 1- \frac{r}{R}  \right)^{1/n}\,.
+    \end{equation*}
+
+    \item la funzione di parete di Launder e Spalding (1974), espressa in forma adimensionale come \(w^+\) in funzione di \(y^+\) e definita come segue:
+    \[
+    w^+ =
+    \begin{cases} 
+        y^+ & \text{se } y^+ < 11.6\,, \\
+        \frac{1}{\kappa} \ln(Ey^+) & \text{se } 11.6 \leq y^+ \leq 130\,,
+    \end{cases}
+    \]
+    dove \(\kappa = 0.41\) è la costante di Von Karman ed \(E = 8.6\) è un coefficiente di rugosità impostato per pareti idraulicamente lisce. Confronta il profilo \(w^+(y^+)\) ottenuto dalla simulazione CFD con la stima derivata dalla funzione di parete di equilibrio nel suo intervallo di validità; si consiglia di presentare i risultati in un grafico log-log. Quali considerazioni puoi fare?
+\end{itemize}
+
+\NotionDivider
+
+Osservando i profili di velocità di Figura~\ref{fig:prof_vel_validazione}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]
+    {r_vel_val.jpeg}  
+    \caption{Confronto dei profili di velocità.}
+    \label{fig:prof_vel_validazione}
+\end{figure}
+
+Si nota una discrepanza per \( r = 0 \) (all'asse), in particolare per i grafici che seguono la legge di Nikuradse. Analizzando la relazione proposta da questa legge, si evidenziano delle differenze rispetto al modello su cui si basa la nostra simulazione CFD. La relazione iniziale è la seguente:
+
+\[
+W = W_0 \left( 1 - \frac{r}{R} \right)^{\frac{1}{n}}
+\]
+
+(Consideriamo $n=1/\sqrt{0.0190} \approx 7$)\\
+1. Derivata prima rispetto a \( r \):\\
+Deriviamo entrambi i membri rispetto a \( r \):
+\[
+\frac{dW}{dr} = W_0 \cdot \frac{d}{dr} \left( \left(1 - \frac{r}{R}\right)^{\frac{1}{n}} \right)
+\]
+
+\[
+\frac{dW}{dr} = -\frac{W_0}{nR} \left(1 - \frac{r}{R}\right)^{\frac{1}{n} - 1}
+\]
+2. Calcolo del limite per \( r \to 0 \):\\
+Sostituendo \( r = 0 \) nella derivata:
+\[
+\frac{dW}{dr} \bigg|_{r \to 0} = -\frac{W_0}{nR} \left(1 - \frac{0}{R}\right)^{\frac{1}{n} - 1} = -\frac{W_0}{nR}\not\to 0
+\]
+3. Calcolo del limite per \( r \to R \):\\
+Quando \( r \to R \), la derivata tende a infinito:
+\[
+\frac{dW}{dr} \bigg|_{r \to R} = -\frac{W_0}{nR} \left(1 - \frac{r}{R}\right)^{\frac{1}{n} - 1} \to +\infty
+\]
+
+Si osserva una discordanza per il caso di \( r = 0 \), poiché, secondo la teoria, la derivata dovrebbe essere pari a zero in questo punto, indicando uno sforzo viscoso nullo. La simulazione CFD, invece, si comporta coerentemente con la teoria in \( r = 0 \) (dove \( \frac{dW}{dr} = 0 \)) e in \( r = R \) (dove \( \frac{dW}{dr} \to +\infty \)).
+
+Invece, si nota un distacco tra i risultati della simulazione CFD e i dati sperimentali, nonostante questi ultimi mostrino un comportamento coerente sia all'asse che alla parete. Pertanto, sarebbe utile approfondire l'analisi del set-up dell'esperimento.
+
+%
+
+La Figura~\ref{fig:w_plus_validazione} mostra la coerenza tra la simulazione CFD e la teoria di Luder \& Spolding, in quanto fa riferimento a una simulazione con una griglia di dimensioni \(1 \times 20 \times 200\) senza l'uso di una power law, che determina un valore di \( y^+ \approx 45 \). Le curve in Figura~\ref{fig:w_plus_validazione} evidenziano un andamento simile tra la simulazione CFD e la teoria, con \( y^+ \) inferiore a 130. Allontanandosi dalla parete, i valori di \( y^+ \) aumentano, ma ciò che ci interessa è che le due curve siano allineate nella regione di \( y^+ \) compresa tra 45 e 130.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]
+    {w_plus_yplus_validazione.png}  
+    \caption{Confronto del profilo $w^+ \ \text{vs} \  y^+$.}
+    \label{fig:w_plus_validazione}
+\end{figure}
+
+\subsubsection*{Profilo dell'energia cinetica turbolenta lungo il raggio del tubo}
+
+La validazione viene estesa al profilo dell'energia cinetica turbolenta lungo il raggio del tubo. Si raccomanda di presentare i risultati in forma adimensionale come \(k/W_b^2\) in funzione di \(r/R\). I termini di confronto sono i seguenti:
+\begin{itemize}
+    \item i dati ottenuti sperimentalmente da Torbergsen (1998), già presentati in forma adimensionale \(k/W_b^2\) in funzione di \(r/R\).
+    \item la seguente formula empirica riportata nella tesi di Kam Hong Ng (1971), già presentata in forma adimensionale:
+    \[
+    \frac{k}{W_b^2} = \frac{f}{8} \left[1 + \frac{2}{3} \left(\frac{r}{R}\right) + \frac{10}{3} \left(\frac{r}{R}\right)^3\right]\,.
+    \]
+\end{itemize}
+Anche in questo caso, devono essere utilizzate le stime di \(f\) dalle formule precedenti.
+
+\NotionDivider
+
+Osserviamo la Figura~\ref{fig:K_validazione}:
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]
+    {K_validazione.png}  
+    \caption{Confronto profilo energia cinetica turbolenta.}
+    \label{fig:K_validazione}
+\end{figure}
+
+I grafici ottenuti mostrano un andamento qualitativo coerente con le aspettative, con un'energia cinetica turbolenta inizialmente bassa all'asse che aumenta progressivamente fino a raggiungere un picco in prossimità della parete. Questo comportamento è attribuibile alla dominanza della turbolenza e del moto caotico a causa dell'interazione con la parete. Tuttavia, è stata osservata una discrepanza significativa tra i dati sperimentali, la simulazione CFD e la formula empirica di Kam Hong. La differenza nei dati sperimentali può essere spiegata dal fatto che la misurazione diretta dell'energia cinetica turbolenta in tale regione è particolarmente complessa, in quanto si tratta di flussi turbolenti. È plausibile che i dati sperimentali siano ottenuti indirettamente, utilizzando misurazioni di grandezze correlate.
+
+Per comprendere meglio la discrepanza con la formula empirica di Kam Hong, sarebbe opportuno analizzare nel dettaglio la metodologia di derivazione di tale relazione.
+
+In generale, ci si può aspettare un certo discostamento dai valori teorici man mano che ci si avvicina alla parete, in quanto la dinamica del flusso in questa regione diventa più complessa. Da un lato, è difficile per i modelli catturare correttamente questo comportamento, mentre, dall'altro lato, la misurazione sperimentale di queste grandezze è altrettanto complessa, rendendo difficile ottenere dati precisi in prossimità della parete.
+
+\subsubsection*{Profilo del tasso di dissipazione turbolenta lungo il raggio del tubo}
+
+Infine, la validazione si concentra sul profilo del tasso di dissipazione turbolenta lungo il raggio del tubo. Si raccomanda di presentare i risultati in forma adimensionale come \(\epsilon R/W_b^3\) in funzione di \(r/R\). I termini di confronto sono i seguenti:
+\begin{itemize}
+    \item i dati ottenuti sperimentalmente da Torbergsen (1998), già presentati in forma adimensionale \(\epsilon R/W_b^3\) in funzione di \(r/R\). In particolare, vengono fornite tre serie di dati, che corrispondono a metodi diversi per stimare \(\epsilon\) dalla stessa serie di dati sperimentali. La differenza tra le tre serie sottolinea le difficoltà nel fornire stime sperimentali di \(\epsilon\),
+    \item la seguente relazione alla base del modello di turbolenza \(k-\epsilon\):
+    \[
+    \epsilon(r) = C_d \frac{k^2(r)}{l_m(r)} = 0.1643 \frac{k^2(r)}{l_m(r)},
+    \]
+    dove \(l_m\) è la lunghezza di miscelazione, che è una caratteristica tipica della scala di turbolenza.
+\end{itemize}
+
+\NotionDivider
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]
+    {eps_validation.png}  
+    \caption{Confronto del profilo del tasso di dissipazione turbolenta.}
+    \label{fig:eps_validazione}
+\end{figure}
+
+La Figura~\ref{fig:eps_validazione} mostra che i tassi di dissipazione turbolenta assumono valori relativamente bassi, a causa della condizione imposta nella simulazione CFD, in cui si considera $y^+ > 5$, escludendo lo sviluppo del sublayer viscoso. Tuttavia, in prossimità della parete, il modello turbolento evidenzia un'esplosione del tasso di dissipazione, probabilmente dovuta alla capacità del modello di catturare la dinamica del sublayer viscoso, responsabile della forte dissipazione turbolenta vicino alla parete.
+
+Inoltre, la stessa figura evidenzia come i tassi di dissipazione turbolenta si discostino ulteriormente avvicinandosi alla parete, dove la dinamica caotica diventa sufficientemente complessa da rendere difficile la sua descrizione sia attraverso i modelli turbolenti, sia mediante misurazioni sperimentali. È probabile che queste ultime siano ottenute in modo indiretto, utilizzando misure di grandezze correlate a quella di interesse.
+
+\newpage
